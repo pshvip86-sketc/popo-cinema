@@ -13,8 +13,9 @@
   <meta property="og:title" content="포포시네마 김포풍무점">
   <meta property="og:description" content="어린이들에게 첫 영화 관람의 즐거운 기억을 선물해 드려요 · 키즈 전용 영화관">
   <meta property="og:url" content="https://popo-cinema.vercel.app/">
-  <!-- og.png(1200x630)를 이 폴더에 올린 뒤 아래 줄의 주석을 해제하세요 -->
-  <!-- <meta property="og:image" content="https://popo-cinema.vercel.app/og.png"> -->
+  <meta property="og:image" content="https://popo-cinema.vercel.app/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
 
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%AC%3C/text%3E%3C/svg%3E">
 
@@ -87,6 +88,19 @@
     .show-time { font-weight: 700; color: #FF7B7B; min-width: 44px; font-variant-numeric: tabular-nums; }
     .show-title { flex: 1; color: #2C2C2A; }
     .show-meta { font-size: 11px; color: #888780; white-space: nowrap; }
+
+    /* 공간 사진: 옆으로 밀어서 보는 갤러리 (스크립트 없이 CSS scroll-snap) */
+    .gallery { display: flex; gap: 10px; overflow-x: auto; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; margin: 0 -1.25rem 12px; padding: 0 1.25rem; scrollbar-width: none; }
+    .gallery::-webkit-scrollbar { display: none; }
+    .gallery:focus-visible { outline: 2px solid #FF7B7B; outline-offset: 2px; }
+    .gallery figure { flex: 0 0 min(82%, 340px); scroll-snap-align: center; position: relative; border-radius: 16px; overflow: hidden; border: 1px solid #FFE0CC; background: #FFE0CC; aspect-ratio: 3 / 2; }
+    .gallery img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .gallery figcaption { position: absolute; left: 10px; bottom: 10px; background: rgba(44,44,42,0.72); color: #fff; font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: 20px; }
+
+    .copy-btn { margin-top: 8px; border: 1px solid #FFB347; background: #fff; color: #B45309; border-radius: 999px; padding: 7px 14px; font-size: 12px; font-weight: 500; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; }
+    .copy-btn:active { background: #FFF8E8; }
+    .copy-btn:focus-visible { outline: 2px solid #FF7B7B; outline-offset: 2px; }
+    .copy-btn.done { background: #FFF8E8; border-color: #B45309; }
 
     .price-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 0.75rem; }
     .price-card { background: #FFF0F8; border-radius: 12px; padding: 1rem; text-align: center; border: 1px solid #FFD6E8; }
@@ -177,6 +191,30 @@
 
   <div class="section flush-top">
     <div class="section-title">🏠 관람 공간 안내</div>
+
+    <div class="gallery" role="region" aria-label="포포시네마 공간 사진 (옆으로 넘겨 보세요)" tabindex="0">
+      <figure>
+        <img src="entrance.jpg" width="1000" height="562" alt="노란 줄무늬 어닝과 초록 벽면에 'POPO CINEMA' 간판이 있는 매표소 입구" style="object-position: 72% 50%;">
+        <figcaption>매표소 입구</figcaption>
+      </figure>
+      <figure>
+        <img src="photozone.jpg" width="1000" height="562" alt="포포 강아지 인형 두 개가 반기는 노란 벽의 포토존" loading="lazy" decoding="async">
+        <figcaption>포토존</figcaption>
+      </figure>
+      <figure>
+        <img src="lobby.jpg" width="1000" height="750" alt="상영 시간표와 상영관 CCTV 화면이 나오는 모니터 벽, 연두색 쿠션 의자가 있는 로비" loading="lazy" decoding="async">
+        <figcaption>CCTV 관람</figcaption>
+      </figure>
+      <figure>
+        <img src="theater-1.jpg" width="1000" height="751" alt="알록달록한 빈백이 놓인 도넛·아이스크림 콘셉트의 상영관" loading="lazy" decoding="async">
+        <figcaption>상영관</figcaption>
+      </figure>
+      <figure>
+        <img src="theater-2.jpg" width="1000" height="751" alt="빈백과 큰 스크린이 있는 상영관 전경" loading="lazy" decoding="async">
+        <figcaption>상영관 스크린</figcaption>
+      </figure>
+    </div>
+
     <div class="info-card">
       <h3>💃 야광댄스타임이란?</h3>
       <p>
@@ -303,7 +341,10 @@
     <div class="info-card">
       <div class="info-row">
         <span class="info-label">주소</span>
-        <span class="info-value">경기 김포시 풍무로 167<br>김포풍무 홈플러스 지하 1층<br>(푸드코트 바로 옆)</span>
+        <span class="info-value">경기 김포시 풍무로 167<br>김포풍무 홈플러스 지하 1층<br>(푸드코트 바로 옆)<br>
+          <!-- data-copy: 내비·지도 앱에 붙여넣기 좋은 도로명 주소만 복사돼요 -->
+          <button type="button" class="copy-btn" data-copy="경기 김포시 풍무로 167" aria-live="polite">📋 주소 복사</button>
+        </span>
       </div>
       <div class="info-row">
         <span class="info-label">주차</span>
@@ -533,6 +574,36 @@
         if ((from && today < from) || (until && today > until)) n.hidden = true;
       });
     }
+
+    /* ───────────── 주소 복사 ───────────── */
+    async function copyText(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch (e) {
+        // 클립보드 API가 막힌 환경(앱 내 브라우저 등)용 대체 방법
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0';
+        document.body.append(ta);
+        ta.select();
+        let ok = false;
+        try { ok = document.execCommand('copy'); } catch (e2) {}
+        ta.remove();
+        return ok;
+      }
+    }
+
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+      const label = btn.textContent;
+      btn.addEventListener('click', async () => {
+        const ok = await copyText(btn.dataset.copy);
+        btn.textContent = ok ? '✓ 복사됐어요' : '길게 눌러 직접 복사해 주세요';
+        btn.classList.toggle('done', ok);
+        setTimeout(() => { btn.textContent = label; btn.classList.remove('done'); }, 2000);
+      });
+    });
 
     applyDateWindows();
     initSheet();
