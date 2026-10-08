@@ -50,7 +50,8 @@
     .popo-hero { background: linear-gradient(160deg, #FFB347 0%, #FF7B7B 60%, #FF5CAD 100%); padding: 2.5rem 1.5rem 3rem; text-align: center; position: relative; overflow: hidden; }
     .popo-hero::before { content: '🎬'; position: absolute; font-size: 120px; opacity: 0.08; top: -20px; right: -20px; }
     .popo-hero-badge { display: inline-block; background: rgba(255,255,255,0.25); color: #fff; font-size: 11px; font-weight: 500; padding: 4px 12px; border-radius: 20px; margin-bottom: 0.75rem; letter-spacing: 0.5px; }
-    .popo-hero h1 { font-size: 32px; font-weight: 700; color: #fff; line-height: 1.2; margin-bottom: 0.5rem; text-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+    .hero-logo { display: block; width: 260px; max-width: 80%; height: auto; margin: 0 auto 0.6rem; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.18)); }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } /* 화면에는 안 보이고 검색·스크린리더에만 읽히는 제목 */
     .popo-hero p { color: rgba(255,255,255,0.9); font-size: 13px; line-height: 1.6; }
 
     .event-banner { background: linear-gradient(135deg, #7C3AED, #A855F7); margin: 1.25rem 1.25rem 0; border-radius: 16px; padding: 1rem 1.25rem; position: relative; overflow: hidden; }
@@ -135,6 +136,7 @@
     .info-value { color: #444441; line-height: 1.6; }
 
     .footer { background: #444441; padding: 1.5rem 1.25rem; text-align: center; color: #B4B2A9; font-size: 11px; line-height: 1.8; }
+    .footer-logo { display: block; width: 130px; height: auto; margin: 0 auto 0.75rem; }
     .footer .footer-name { font-size: 14px; font-weight: 500; color: #FFB347; margin-bottom: 6px; }
     .footer a { color: #FFB347; text-decoration: none; }
 
@@ -148,8 +150,9 @@
 <body>
 
   <div class="popo-hero">
-    <div class="popo-hero-badge">🎠 키즈 전용 영화관 · 김포풍무점</div>
-    <h1>포포시네마</h1>
+    <div class="popo-hero-badge">🎠 키즈 전용 영화관</div>
+    <h1 class="sr-only">포포시네마 김포풍무점</h1>
+    <img class="hero-logo" src="logo-line.png" width="648" height="94" fetchpriority="high" alt="포포시네마">
     <p>어린이들에게 첫 영화 관람의<br>즐거운 기억을 선물해 드려요</p>
   </div>
 
@@ -372,6 +375,7 @@
   </div>
 
   <div class="footer">
+    <img class="footer-logo" src="logo-mascot.png" width="448" height="334" loading="lazy" decoding="async" alt="포포시네마 마스코트">
     <div class="footer-name">포포시네마 김포풍무점</div>
     경기 김포시 풍무로 167 홈플러스 지하 1층<br>
     Tel. 070-4800-6068 · 운영 수~일 10:00~18:00 (월·화 휴관)<br><br>
