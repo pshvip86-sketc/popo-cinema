@@ -2,18 +2,54 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>포포시네마 김포풍무점</title>
+  <meta name="description" content="김포 풍무 홈플러스 지하 1층 키즈 전용 영화관. 야광댄스타임, 단체관람·대관 문의, 상영 시간표를 확인하세요.">
+  <meta name="theme-color" content="#FF7B7B">
+
+  <!-- 카카오톡·문자로 링크를 공유할 때 보이는 미리보기 -->
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ko_KR">
+  <meta property="og:title" content="포포시네마 김포풍무점">
+  <meta property="og:description" content="어린이들에게 첫 영화 관람의 즐거운 기억을 선물해 드려요 · 키즈 전용 영화관">
+  <meta property="og:url" content="https://popo-cinema.vercel.app/">
+  <!-- og.png(1200x630)를 이 폴더에 올린 뒤 아래 줄의 주석을 해제하세요 -->
+  <!-- <meta property="og:image" content="https://popo-cinema.vercel.app/og.png"> -->
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%AC%3C/text%3E%3C/svg%3E">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- 검색엔진용 영화관 정보 -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "MovieTheater",
+    "name": "포포시네마 김포풍무점",
+    "telephone": "+82-70-4800-6068",
+    "url": "https://popo-cinema.vercel.app/",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "풍무로 167 홈플러스 지하 1층",
+      "addressLocality": "김포시",
+      "addressRegion": "경기도",
+      "addressCountry": "KR"
+    },
+    "openingHours": "We-Su 10:00-18:00"
+  }
+  </script>
+
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Noto Sans KR', sans-serif; background: #FFF8F0; color: #2C2C2A; padding-bottom: 80px; }
+    body { font-family: 'Noto Sans KR', sans-serif; background: #FFF8F0; color: #2C2C2A; padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
+    [hidden] { display: none !important; }
 
     .popo-hero { background: linear-gradient(160deg, #FFB347 0%, #FF7B7B 60%, #FF5CAD 100%); padding: 2.5rem 1.5rem 3rem; text-align: center; position: relative; overflow: hidden; }
     .popo-hero::before { content: '🎬'; position: absolute; font-size: 120px; opacity: 0.08; top: -20px; right: -20px; }
     .popo-hero-badge { display: inline-block; background: rgba(255,255,255,0.25); color: #fff; font-size: 11px; font-weight: 500; padding: 4px 12px; border-radius: 20px; margin-bottom: 0.75rem; letter-spacing: 0.5px; }
-    .popo-hero h1 { font-family: 'Noto Sans KR', sans-serif; font-size: 32px; font-weight: 700; color: #fff; line-height: 1.2; margin-bottom: 0.5rem; text-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+    .popo-hero h1 { font-size: 32px; font-weight: 700; color: #fff; line-height: 1.2; margin-bottom: 0.5rem; text-shadow: 0 2px 8px rgba(0,0,0,0.12); }
     .popo-hero p { color: rgba(255,255,255,0.9); font-size: 13px; line-height: 1.6; }
 
     .event-banner { background: linear-gradient(135deg, #7C3AED, #A855F7); margin: 1.25rem 1.25rem 0; border-radius: 16px; padding: 1rem 1.25rem; position: relative; overflow: hidden; }
@@ -24,45 +60,75 @@
     .event-desc span { display: block; }
 
     .section { padding: 2rem 1.25rem; }
-    .section-title { font-family: 'Noto Sans KR', sans-serif; font-size: 18px; font-weight: 700; color: #FF7B7B; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
+    .section.flush-top { padding-top: 0; }
+    .section-title { font-size: 18px; font-weight: 700; color: #FF7B7B; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
     .info-card { background: #fff; border-radius: 16px; padding: 1.25rem; margin-bottom: 12px; border: 1px solid #FFE0CC; }
+    .info-card h3 { font-size: 13px; font-weight: 500; margin-bottom: 10px; color: #FF7B7B; }
+    .info-card p { font-size: 12.5px; color: #5F5E5A; line-height: 1.8; }
 
     .schedule-btn { display: flex; align-items: center; justify-content: space-between; background: linear-gradient(135deg, #FFB347, #FF7B7B); color: #fff; border-radius: 14px; padding: 1rem 1.25rem; text-decoration: none; font-weight: 500; font-size: 14px; margin-bottom: 10px; transition: transform 0.15s; }
     .schedule-btn:hover { transform: translateY(-2px); }
+    .schedule-btn.map { margin-top: 8px; }
     .schedule-btn .left { display: flex; align-items: center; gap: 10px; }
     .schedule-btn .icon { font-size: 24px; }
     .schedule-btn .label { font-size: 11px; opacity: 0.85; display: block; margin-bottom: 2px; }
     .schedule-btn .title { font-size: 14px; font-weight: 700; }
     .schedule-btn .arrow { font-size: 18px; opacity: 0.8; }
 
+    /* 오늘 상영 / 휴관 안내 (구글 시트에서 채워짐) */
+    .today-status { border-radius: 14px; padding: 0.9rem 1.1rem; margin-bottom: 10px; font-size: 13px; line-height: 1.7; }
+    .today-status.closed { background: #F1EFE8; color: #444441; border: 1px solid #D3D1C7; font-weight: 500; }
+    .today-status.notice { background: #FFF8E8; color: #7A4B00; border: 1px solid #FFE0A0; }
+    .today-schedule { background: #fff; border: 1px solid #FFE0CC; border-radius: 14px; padding: 0.4rem 1.1rem; margin-bottom: 10px; }
+    .today-schedule h3 { font-size: 12px; font-weight: 500; color: #888780; padding: 0.6rem 0 0.2rem; }
+    .show-row { display: flex; align-items: baseline; gap: 10px; padding: 9px 0; border-bottom: 0.5px solid #FFE0CC; font-size: 13px; }
+    .show-row:last-child { border-bottom: none; }
+    .show-row.past { opacity: 0.45; }
+    .show-time { font-weight: 700; color: #FF7B7B; min-width: 44px; font-variant-numeric: tabular-nums; }
+    .show-title { flex: 1; color: #2C2C2A; }
+    .show-meta { font-size: 11px; color: #888780; white-space: nowrap; }
+
     .price-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 0.75rem; }
     .price-card { background: #FFF0F8; border-radius: 12px; padding: 1rem; text-align: center; border: 1px solid #FFD6E8; }
     .price-card .p-name { font-size: 11px; color: #FF5CAD; font-weight: 500; margin-bottom: 6px; }
     .price-card .p-price { font-size: 20px; font-weight: 700; color: #FF5CAD; }
     .price-card .p-unit { font-size: 11px; color: #888780; }
+    .price-card.movie { background: #FFF8E8; border-color: #FFE0A0; }
+    .price-card.movie .p-name, .price-card.movie .p-price { color: #FFB347; }
+    .price-note { font-size: 11px; color: #888780; margin-top: 8px; padding: 0 4px; }
 
+    .inquiry-lead { font-size: 12px; color: #888780; margin-bottom: 1rem; line-height: 1.6; }
+    .inquiry-list { display: flex; flex-direction: column; gap: 10px; }
+    .inquiry-btn { border-radius: 12px; padding: 14px 20px; font-size: 14px; font-weight: 700; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .inquiry-btn.kakao { background: #FEE500; color: #3C1E1E; }
+    .inquiry-btn.tel { background: #fff; color: #FF7B7B; border: 1.5px solid #FFB347; }
+
+    /* FAQ: <details>/<summary> — 키보드·스크린리더에서 기본 지원 */
     .faq-item { background: #fff; border-radius: 14px; margin-bottom: 8px; border: 1px solid #FFE0CC; overflow: hidden; }
-    .faq-q { padding: 1rem 1.25rem; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; color: #2C2C2A; user-select: none; }
+    .faq-q { padding: 1rem 1.25rem; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; color: #2C2C2A; user-select: none; list-style: none; }
+    .faq-q::-webkit-details-marker { display: none; }
     .faq-q:hover { background: #FFF8F0; }
+    .faq-q:focus-visible { outline: 2px solid #FF7B7B; outline-offset: -2px; }
     .faq-q .q-badge { background: #FFB347; color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 8px; flex-shrink: 0; margin-top: 1px; }
     .faq-q .arrow { font-size: 16px; color: #FFB347; flex-shrink: 0; transition: transform 0.2s; }
-    .faq-q.open .arrow { transform: rotate(180deg); }
-    .faq-a { display: none; padding: 0 1.25rem 1rem; font-size: 12.5px; color: #5F5E5A; line-height: 1.8; border-top: 1px solid #FFF0E6; background: #FFFAF6; }
-    .faq-a.open { display: block; }
+    .faq-item[open] .faq-q .arrow { transform: rotate(180deg); }
+    .faq-a { padding: 0 1.25rem 1rem; font-size: 12.5px; color: #5F5E5A; line-height: 1.8; border-top: 1px solid #FFF0E6; background: #FFFAF6; }
+    .faq-a > :first-child { margin-top: 0.75rem; }
 
     .info-row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 0.5px solid #FFE0CC; font-size: 13px; }
     .info-row:last-child { border-bottom: none; }
-    .info-label { color: #FFB347; font-weight: 500; min-width: 60px; flex-shrink: 0; }
+    .info-label { color: #B45309; font-weight: 500; min-width: 60px; flex-shrink: 0; } /* 기존 #FFB347은 흰 배경에서 글자가 흐려서 진하게 */
     .info-value { color: #444441; line-height: 1.6; }
 
     .footer { background: #444441; padding: 1.5rem 1.25rem; text-align: center; color: #B4B2A9; font-size: 11px; line-height: 1.8; }
+    .footer .footer-name { font-size: 14px; font-weight: 500; color: #FFB347; margin-bottom: 6px; }
     .footer a { color: #FFB347; text-decoration: none; }
 
-    .fixed-inquiry { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid #FFE0CC; padding: 10px 1.25rem; display: flex; gap: 8px; z-index: 999; box-shadow: 0 -4px 16px rgba(0,0,0,0.08); }
-    .fixed-kakao { flex: 1; background: #FEE500; color: #3C1E1E; border: none; border-radius: 10px; padding: 12px 8px; font-size: 13px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; transition: transform 0.15s; }
-    .fixed-kakao:hover { transform: translateY(-1px); }
-    .fixed-call { flex: 1; background: linear-gradient(135deg, #FFB347, #FF7B7B); color: #fff; border: none; border-radius: 10px; padding: 12px 8px; font-size: 13px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; transition: transform 0.15s; }
-    .fixed-call:hover { transform: translateY(-1px); }
+    .fixed-inquiry { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid #FFE0CC; padding: 10px 1.25rem calc(10px + env(safe-area-inset-bottom)); display: flex; gap: 8px; z-index: 999; box-shadow: 0 -4px 16px rgba(0,0,0,0.08); }
+    .fixed-kakao, .fixed-call { flex: 1; border: none; border-radius: 10px; padding: 12px 8px; font-size: 13px; font-weight: 700; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 6px; transition: transform 0.15s; }
+    .fixed-kakao { background: #FEE500; color: #3C1E1E; }
+    .fixed-call { background: linear-gradient(135deg, #FFB347, #FF7B7B); color: #fff; }
+    .fixed-kakao:hover, .fixed-call:hover { transform: translateY(-1px); }
   </style>
 </head>
 <body>
@@ -73,32 +139,54 @@
     <p>어린이들에게 첫 영화 관람의<br>즐거운 기억을 선물해 드려요</p>
   </div>
 
+  <!--
+    이벤트 배너 (필요할 때만 주석을 풀어 쓰세요)
+    data-until 날짜(한국시간)가 지나면 자동으로 사라져서, 끝난 이벤트가 남아 있을 일이 없어요.
+
+  <div class="event-banner" data-until="2026-12-31">
+    <div class="event-badge">🎊 진행중 이벤트</div>
+    <div class="event-title">이벤트 제목</div>
+    <div class="event-desc">
+      <span>이벤트 설명 1</span>
+      <span>이벤트 설명 2</span>
+    </div>
+  </div>
+  -->
+
   <div class="section">
     <div class="section-title">🎬 상영 일정</div>
-    <a href="https://www.monoplex.kr/space/oxxN6Ykd3WXh-OXVTBuUFA" class="schedule-btn" target="_blank">
+
+    <!-- 구글 시트 연결 시 JS가 채웁니다. 연결 전/실패 시에는 숨겨져 있고 아래 버튼만 보여요. -->
+    <div id="today-status" class="today-status" role="status" hidden></div>
+    <div id="today-schedule" class="today-schedule" hidden>
+      <h3 id="today-schedule-title">오늘 상영</h3>
+      <div id="today-schedule-list"></div>
+    </div>
+
+    <a href="https://www.monoplex.kr/space/oxxN6Ykd3WXh-OXVTBuUFA" class="schedule-btn" target="_blank" rel="noopener noreferrer">
       <div class="left">
-        <span class="icon">🗓️</span>
+        <span class="icon" aria-hidden="true">🗓️</span>
         <div>
           <span class="label">상영 시간표 · 예매</span>
-          <span class="title">오늘 상영 영화 & 예매하기</span>
+          <span class="title">오늘 상영 영화 &amp; 예매하기</span>
         </div>
       </div>
-      <span class="arrow">→</span>
+      <span class="arrow" aria-hidden="true">→</span>
     </a>
   </div>
 
-  <div class="section" style="padding-top: 0;">
+  <div class="section flush-top">
     <div class="section-title">🏠 관람 공간 안내</div>
     <div class="info-card">
-      <div style="font-size: 13px; font-weight: 500; margin-bottom: 10px; color: #FF7B7B;">💃 야광댄스타임이란?</div>
-      <div style="font-size: 12.5px; color: #5F5E5A; line-height: 1.8;">
+      <h3>💃 야광댄스타임이란?</h3>
+      <p>
         어둠 속에서 미러볼이 나오고 춤추는 영상이 약 10분간 진행돼요.<br>
         상영 시작 전, 신나게 춤추며 즐기는 특별한 시간이에요! 🪩
-      </div>
+      </p>
     </div>
   </div>
 
-  <div class="section" style="padding-top: 0;">
+  <div class="section flush-top">
     <div class="section-title">🎫 이용 요금</div>
     <div class="price-grid">
       <div class="price-card">
@@ -106,110 +194,111 @@
         <div class="p-price">14,500</div>
         <div class="p-unit">원 / 1인</div>
       </div>
-      <div class="price-card" style="background: #FFF8E8; border-color: #FFE0A0;">
-        <div class="p-name" style="color: #FFB347;">🎬 영화패키지</div>
-        <div class="p-price" style="color: #FFB347;">11,000</div>
+      <div class="price-card movie">
+        <div class="p-name">🎬 영화패키지</div>
+        <div class="p-price">11,000</div>
         <div class="p-unit">원 / 1인</div>
       </div>
     </div>
-    <div style="font-size: 11px; color: #888780; margin-top: 8px; padding: 0 4px;">
+    <div class="price-note">
       ※ 대관 이용 시 — 1관(40석): 시간당 20만원 / 2관(70석): 시간당 35만원
     </div>
   </div>
 
-  <div class="section" style="padding-top: 0;">
+  <div class="section flush-top">
     <div class="section-title">📞 단체 · 대관 문의</div>
-    <div style="font-size: 12px; color: #888780; margin-bottom: 1rem; line-height: 1.6;">
+    <div class="inquiry-lead">
       단체관람(15인 이상) 및 대관 관련 문의는<br>
-      카카오 채팅 또는 전화로 연락 주세요 (운영시간 10:00~17:30)
+      카카오 채팅 또는 전화로 연락 주세요 (운영시간 10:00~18:00)
     </div>
-    <div style="display: flex; flex-direction: column; gap: 10px;">
-      <a href="https://pf.kakao.com/_FVbxiX/chat" style="background: #FEE500; color: #3C1E1E; border-radius: 12px; padding: 14px 20px; font-size: 14px; font-weight: 700; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
+    <div class="inquiry-list">
+      <a href="https://pf.kakao.com/_FVbxiX/chat" class="inquiry-btn kakao" target="_blank" rel="noopener noreferrer">
         💬 카카오톡으로 문의하기
       </a>
-      <a href="tel:07048006068" style="background: #fff; color: #FF7B7B; border: 1.5px solid #FFB347; border-radius: 12px; padding: 14px 20px; font-size: 14px; font-weight: 700; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
+      <a href="tel:07048006068" class="inquiry-btn tel">
         📞 전화로 문의하기 · 070-4800-6068
       </a>
     </div>
   </div>
 
-  <div class="section" style="padding-top: 0;">
+  <div class="section flush-top">
     <div class="section-title">❓ 자주 묻는 질문</div>
 
-    <div class="faq-item">
-      <div class="faq-q" onclick="toggleFaq(this)">
+    <!-- name="faq"가 같은 details는 하나만 열려요 (지원 안 하는 구형 브라우저에서는 여러 개가 열릴 뿐 정상 동작) -->
+    <details class="faq-item" name="faq">
+      <summary class="faq-q">
         <span><span class="q-badge">Q</span> 주차는 가능한가요?</span>
-        <span class="arrow">▾</span>
-      </div>
+        <span class="arrow" aria-hidden="true">▾</span>
+      </summary>
       <div class="faq-a">
-        홈플러스 주차장 무료 이용 가능합니다.<br><br>
+        <p>홈플러스 주차장 무료 이용 가능합니다.<br><br>
         <strong>🚌 버스(단체) 방문 시 안내</strong><br>
         2.2m 이상 차량은 아래 경로로 야외주차장 이용 바랍니다.<br><br>
         • 네이버지도: <strong>홈플러스 김포풍무점 주차장입출구</strong> 검색<br>
         • T맵: <strong>홈플러스 김포풍무점 3층주차장</strong> 검색<br><br>
-        출차 방향으로 입차하시며, 도착 5~10분 전에 전화 주시면 주차차단바를 수동으로 열어드립니다. 📞 070-4800-6068
+        출차 방향으로 입차하시며, 도착 5~10분 전에 전화 주시면 주차차단바를 수동으로 열어드립니다. 📞 070-4800-6068</p>
       </div>
-    </div>
+    </details>
 
-    <div class="faq-item">
-      <div class="faq-q" onclick="toggleFaq(this)">
+    <details class="faq-item" name="faq">
+      <summary class="faq-q">
         <span><span class="q-badge">Q</span> 단체 관람 최소 인원이 있나요?</span>
-        <span class="arrow">▾</span>
-      </div>
+        <span class="arrow" aria-hidden="true">▾</span>
+      </summary>
       <div class="faq-a">
-        최소 15명 이상부터 단체 문의가 가능합니다.<br>
-        15명 미만의 경우 제공되는 서비스가 제한될 수 있으니 참고해 주세요.
+        <p>최소 15명 이상부터 단체 문의가 가능합니다.<br>
+        15명 미만의 경우 제공되는 서비스가 제한될 수 있으니 참고해 주세요.</p>
       </div>
-    </div>
+    </details>
 
-    <div class="faq-item">
-      <div class="faq-q" onclick="toggleFaq(this)">
+    <details class="faq-item" name="faq">
+      <summary class="faq-q">
         <span><span class="q-badge">Q</span> 단체 요금은 어떻게 되나요?</span>
-        <span class="arrow">▾</span>
-      </div>
+        <span class="arrow" aria-hidden="true">▾</span>
+      </summary>
       <div class="faq-a">
-        인원별 요금으로 결제됩니다.<br><br>
+        <p>인원별 요금으로 결제됩니다.<br><br>
         • 야광패키지: 14,500원 / 1인<br>
         • 영화패키지: 11,000원 / 1인<br><br>
-        당일 결제로 진행됩니다.
+        당일 결제로 진행됩니다.</p>
       </div>
-    </div>
+    </details>
 
-    <div class="faq-item">
-      <div class="faq-q" onclick="toggleFaq(this)">
+    <details class="faq-item" name="faq">
+      <summary class="faq-q">
         <span><span class="q-badge">Q</span> 음식 반입이 가능한가요?</span>
-        <span class="arrow">▾</span>
-      </div>
+        <span class="arrow" aria-hidden="true">▾</span>
+      </summary>
       <div class="faq-a">
-        음식 반입은 가능합니다.<br>
-        단, 냄새가 강한 음식이나 국물류는 다른 관람객을 위해 자제해 주시기 바랍니다.
+        <p>음식 반입은 가능합니다.<br>
+        단, 냄새가 강한 음식이나 국물류는 다른 관람객을 위해 자제해 주시기 바랍니다.</p>
       </div>
-    </div>
+    </details>
 
-    <div class="faq-item">
-      <div class="faq-q" onclick="toggleFaq(this)">
+    <details class="faq-item" name="faq">
+      <summary class="faq-q">
         <span><span class="q-badge">Q</span> 상영 가능한 영화는 어떻게 확인하나요?</span>
-        <span class="arrow">▾</span>
-      </div>
+        <span class="arrow" aria-hidden="true">▾</span>
+      </summary>
       <div class="faq-a">
-        방문 날짜 및 시간 협의 시 개별적으로 영화 리스트 링크를 제공해 드리고 있습니다.<br>
-        카카오톡 채팅으로 문의해 주시면 빠르게 안내드릴게요 😊
+        <p>방문 날짜 및 시간 협의 시 개별적으로 영화 리스트 링크를 제공해 드리고 있습니다.<br>
+        카카오톡 채팅으로 문의해 주시면 빠르게 안내드릴게요 😊</p>
       </div>
-    </div>
+    </details>
 
-    <div class="faq-item">
-      <div class="faq-q" onclick="toggleFaq(this)">
+    <details class="faq-item" name="faq">
+      <summary class="faq-q">
         <span><span class="q-badge">Q</span> 몇 시부터 방문 가능한가요?</span>
-        <span class="arrow">▾</span>
-      </div>
+        <span class="arrow" aria-hidden="true">▾</span>
+      </summary>
       <div class="faq-a">
-        오전 10시 20분 이후부터 시간 협의가 가능합니다.<br>
-        문의 가능 시간은 10:00 ~ 18:00입니다.
+        <p>오전 10시부터 오후 6시까지 방문 시간 협의가 가능합니다.<br>
+        문의 가능 시간도 10:00 ~ 18:00입니다.</p>
       </div>
-    </div>
+    </details>
   </div>
 
-  <div class="section" style="padding-top: 0;">
+  <div class="section flush-top">
     <div class="section-title">📍 오시는 길</div>
     <div class="info-card">
       <div class="info-row">
@@ -226,30 +315,30 @@
       </div>
       <div class="info-row">
         <span class="info-label">운영</span>
-        <span class="info-value">매일 11:00 ~ 18:00</span>
+        <span class="info-value">수 ~ 일 10:00 ~ 18:00<br>매주 월·화 휴관</span>
       </div>
     </div>
-    <a href="https://map.naver.com/v5/search/홈플러스 김포풍무점" class="schedule-btn" target="_blank" style="margin-top: 8px;">
+    <a href="https://map.naver.com/v5/search/%ED%99%88%ED%94%8C%EB%9F%AC%EC%8A%A4%20%EA%B9%80%ED%8F%AC%ED%92%8D%EB%AC%B4%EC%A0%90" class="schedule-btn map" target="_blank" rel="noopener noreferrer">
       <div class="left">
-        <span class="icon">🗺️</span>
+        <span class="icon" aria-hidden="true">🗺️</span>
         <div>
           <span class="label">네이버지도로 확인하기</span>
           <span class="title">홈플러스 김포풍무점</span>
         </div>
       </div>
-      <span class="arrow">→</span>
+      <span class="arrow" aria-hidden="true">→</span>
     </a>
   </div>
 
   <div class="footer">
-    <div style="font-size: 14px; font-weight: 500; color: #FFB347; margin-bottom: 6px;">포포시네마 김포풍무점</div>
+    <div class="footer-name">포포시네마 김포풍무점</div>
     경기 김포시 풍무로 167 홈플러스 지하 1층<br>
-    Tel. 070-4800-6068 · 운영 11:00~18:00<br><br>
-    <a href="https://www.monoplex.kr/space/oxxN6Ykd3WXh-OXVTBuUFA" target="_blank">모노플렉스 공식 페이지 →</a>
+    Tel. 070-4800-6068 · 운영 수~일 10:00~18:00 (월·화 휴관)<br><br>
+    <a href="https://www.monoplex.kr/space/oxxN6Ykd3WXh-OXVTBuUFA" target="_blank" rel="noopener noreferrer">모노플렉스 공식 페이지 →</a>
   </div>
 
   <div class="fixed-inquiry">
-    <a href="https://pf.kakao.com/_FVbxiX/chat" class="fixed-kakao" target="_blank">
+    <a href="https://pf.kakao.com/_FVbxiX/chat" class="fixed-kakao" target="_blank" rel="noopener noreferrer">
       💬 카카오 문의
     </a>
     <a href="tel:07048006068" class="fixed-call">
@@ -258,18 +347,196 @@
   </div>
 
   <script>
-    function toggleFaq(el) {
-      const answer = el.nextElementSibling;
-      const isOpen = answer.classList.contains('open');
-      document.querySelectorAll('.faq-a.open').forEach(a => a.classList.remove('open'));
-      document.querySelectorAll('.faq-q.open').forEach(q => q.classList.remove('open'));
-      if (!isOpen) {
-        answer.classList.add('open');
-        el.classList.add('open');
+    /* ───────────── 설정 ─────────────
+       구글 시트 연결 방법 (자세한 설명은 README.md 참고)
+       1) 시트에서 파일 → 공유 → 웹에 게시 → 탭 선택 → 'CSV' → 게시
+       2) 나온 주소를 아래에 붙여넣기. 비워두면 이 기능은 꺼진 채로 기존처럼 동작해요. */
+    const CONFIG = {
+      scheduleCsvUrl: '',   // '상영시간표' 탭의 CSV 주소
+      closedCsvUrl: '',     // '휴관일' 탭의 CSV 주소
+      cacheMinutes: 5,      // 시트를 다시 읽기 전 기다리는 시간 (구글 자체 반영 지연도 약 5분)
+      weeklyClosedDays: [1, 2], // 정기 휴관 요일 (0=일 1=월 2=화 3=수 4=목 5=금 6=토) → 월·화
+      upcomingClosedDays: 14 // 오늘부터 며칠 앞까지 휴관 예고를 보여줄지
+    };
+
+    /* ───────────── 날짜·시간 도구 (항상 한국시간 기준) ───────────── */
+    const pad = n => String(n).padStart(2, '0');
+
+    function nowKST() {
+      const p = Object.fromEntries(
+        new Intl.DateTimeFormat('en-GB', {
+          timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit', hourCycle: 'h23'
+        }).formatToParts(new Date()).map(x => [x.type, x.value])
+      );
+      return { date: `${p.year}-${p.month}-${p.day}`, time: `${p.hour}:${p.minute}` };
+    }
+
+    // "2026-10-08", "2026. 10. 8", "2026/10/8" 모두 → "2026-10-08"
+    function normDate(s) {
+      const m = String(s || '').match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);
+      return m ? `${m[1]}-${pad(m[2])}-${pad(m[3])}` : '';
+    }
+
+    // "14:30", "오후 2:30", "오후 2:30:00" 모두 → "14:30"
+    function normTime(s) {
+      const m = String(s || '').match(/(오전|오후)?\s*(\d{1,2}):(\d{2})/);
+      if (!m) return '';
+      let h = Number(m[2]);
+      if (m[1] === '오후' && h < 12) h += 12;
+      if (m[1] === '오전' && h === 12) h = 0;
+      return `${pad(h)}:${m[3]}`;
+    }
+
+    // "2026-10-12" → 1 (0=일 … 6=토)
+    function weekdayOf(dateStr) {
+      const [y, m, d] = dateStr.split('-').map(Number);
+      return new Date(Date.UTC(y, m - 1, d)).getUTCDay();
+    }
+
+    // "2026-10-12" → "10/12(월)"
+    function dayLabel(dateStr) {
+      const [, m, d] = dateStr.split('-').map(Number);
+      return `${m}/${d}(${'일월화수목금토'[weekdayOf(dateStr)]})`;
+    }
+
+    /* ───────────── CSV 읽기 ───────────── */
+    function parseCsv(text) {
+      const rows = [];
+      let row = [], cell = '', inQuotes = false;
+      text = text.replace(/^﻿/, '');
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        if (inQuotes) {
+          if (c === '"' && text[i + 1] === '"') { cell += '"'; i++; }
+          else if (c === '"') inQuotes = false;
+          else cell += c;
+        } else if (c === '"') inQuotes = true;
+        else if (c === ',') { row.push(cell); cell = ''; }
+        else if (c === '\n' || c === '\r') {
+          if (c === '\r' && text[i + 1] === '\n') i++;
+          row.push(cell); cell = '';
+          if (row.some(v => v.trim() !== '')) rows.push(row);
+          row = [];
+        } else cell += c;
+      }
+      row.push(cell);
+      if (row.some(v => v.trim() !== '')) rows.push(row);
+      return rows;
+    }
+
+    // 첫 줄(제목)을 키로 써서 [{날짜:'...', 시간:'...'}] 형태로 변환
+    function toObjects(rows) {
+      if (rows.length < 2) return [];
+      const keys = rows[0].map(k => k.trim());
+      return rows.slice(1).map(r => Object.fromEntries(keys.map((k, i) => [k, (r[i] || '').trim()])));
+    }
+
+    /* 최근에 받은 데이터는 재사용하고, 네트워크가 실패하면 예전에 받아둔 데이터라도 보여줘요 */
+    async function loadSheet(url) {
+      if (!url) return null;
+      const key = 'popo:' + url;
+      let cached = null;
+      try { cached = JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) {}
+      if (cached && Date.now() - cached.t < CONFIG.cacheMinutes * 60000) return cached.rows;
+      try {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 6000);
+        const res = await fetch(url, { signal: ctrl.signal });
+        clearTimeout(timer);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const rows = toObjects(parseCsv(await res.text()));
+        try { localStorage.setItem(key, JSON.stringify({ t: Date.now(), rows })); } catch (e) {}
+        return rows;
+      } catch (e) {
+        console.warn('[popo] 시트를 불러오지 못했어요:', e);
+        return cached ? cached.rows : null;
       }
     }
+
+    /* ───────────── 화면 그리기 (시트 내용은 textContent로만 넣어 코드 삽입을 막아요) ───────────── */
+    function el(tag, className, text) {
+      const n = document.createElement(tag);
+      if (className) n.className = className;
+      if (text !== undefined) n.textContent = text;
+      return n;
+    }
+
+    // weeklyClosed: 오늘이 정기 휴관 요일이고, 시트에 오늘 상영이 따로 없을 때 true
+    function renderStatus(closedRows, today, weeklyClosed) {
+      const box = document.getElementById('today-status');
+      const closed = closedRows
+        .map(r => ({ date: normDate(r['날짜']), reason: r['사유'] || '' }))
+        .filter(r => r.date)
+        .sort((a, b) => a.date.localeCompare(b.date));
+
+      const todays = closed.find(r => r.date === today);
+      if (todays || weeklyClosed) {
+        const reason = todays ? todays.reason : '매주 월·화 정기 휴관';
+        box.className = 'today-status closed';
+        box.textContent = '🚫 오늘은 휴관일이에요' + (reason ? ` · ${reason}` : '');
+        box.hidden = false;
+        return true;
+      }
+      const limit = new Date(Date.now() + CONFIG.upcomingClosedDays * 86400e3);
+      const limitStr = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Asia/Seoul' }).format(limit);
+      const next = closed.find(r => r.date > today && r.date <= limitStr);
+      if (next) {
+        box.className = 'today-status notice';
+        box.textContent = `📅 휴관 안내 · ${dayLabel(next.date)}` + (next.reason ? ` ${next.reason}` : '');
+        box.hidden = false;
+      }
+      return false;
+    }
+
+    function todaysShows(rows, now) {
+      return rows
+        .map(r => ({
+          date: normDate(r['날짜']), time: normTime(r['시간']),
+          screen: r['관'], title: r['영화'], pkg: r['패키지'], memo: r['비고']
+        }))
+        .filter(r => r.date === now.date && r.time && r.title)
+        .sort((a, b) => a.time.localeCompare(b.time));
+    }
+
+    function renderSchedule(todays, now) {
+      if (!todays.length) return;
+
+      const list = document.getElementById('today-schedule-list');
+      list.replaceChildren();
+      todays.forEach(s => {
+        const row = el('div', 'show-row' + (s.time < now.time ? ' past' : ''));
+        row.append(el('span', 'show-time', s.time), el('span', 'show-title', s.title));
+        const meta = [s.screen && (/관$/.test(s.screen) ? s.screen : s.screen + '관'), s.pkg, s.memo].filter(Boolean).join(' · ');
+        if (meta) row.append(el('span', 'show-meta', meta));
+        list.append(row);
+      });
+      document.getElementById('today-schedule').hidden = false;
+    }
+
+    async function initSheet() {
+      const now = nowKST();
+      const weeklyClosedToday = CONFIG.weeklyClosedDays.includes(weekdayOf(now.date));
+      // 시트 주소가 비어 있어도 정기 휴관 요일 안내는 동작해요 (loadSheet가 null을 돌려줌)
+      const [schedule, closed] = await Promise.all([loadSheet(CONFIG.scheduleCsvUrl), loadSheet(CONFIG.closedCsvUrl)]);
+      const shows = schedule ? todaysShows(schedule, now) : [];
+      // 월·화여도 시트에 오늘 상영이 적혀 있으면(공휴일 특별 운영 등) 영업일로 봐요
+      const isClosed = renderStatus(closed || [], now.date, weeklyClosedToday && !shows.length);
+      if (!isClosed) renderSchedule(shows, now);
+    }
+
+    /* ───────────── 기간 한정 요소: data-from / data-until (한국시간, 포함) ───────────── */
+    function applyDateWindows() {
+      const today = nowKST().date;
+      document.querySelectorAll('[data-from],[data-until]').forEach(n => {
+        const from = n.dataset.from, until = n.dataset.until;
+        if ((from && today < from) || (until && today > until)) n.hidden = true;
+      });
+    }
+
+    applyDateWindows();
+    initSheet();
   </script>
 
 </body>
 </html>
-```
