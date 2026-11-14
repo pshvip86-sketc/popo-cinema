@@ -11,9 +11,11 @@
 <meta property="og:url" content="https://popo-cinema.vercel.app/group">
 <link rel="icon" href="/logo-mascot.png">
 <script>
-// 홈페이지(/group)에서 Apps Script 화면과 같은 코드를 쓰기 위한 대체물(버전 26).
+// 홈페이지(/group)에서 Apps Script 화면과 같은 코드를 쓰기 위한 대체물(버전 26, 29에서 시간 제한 추가).
 // google.script.run.withSuccessHandler(f).withFailureHandler(g).함수(인자) → Apps Script 웹앱 doPost로 fetch.
 // text/plain으로 보내 브라우저 사전 확인(preflight) 없이 동작한다.
+// 응답이 너무 늦으면(신청 45초, 그 밖 25초) 실패로 알려 버튼이 계속 잠기지 않게 한다.
+// 신청은 번호표(reqId)가 있어 다시 눌러도 중복 접수되지 않는다.
 (function () {
   var API = 'https://script.google.com/macros/s/AKfycbzypcY-bq8J232fEtC3pFHWhVH8Mw7Sb72USfwXnJfZUnkBtPei7KtsCJK6zIiEb9uj/exec';
   function runner() {
@@ -23,11 +25,18 @@
       if (k === 'withFailureHandler') return function (f) { fail = f; return p; };
       return function () {
         var args = Array.prototype.slice.call(arguments);
+        var ctl = typeof AbortController === 'function' ? new AbortController() : null;
+        var done = false;   // 성공·실패 중 한 번만 알린다
+        var finish = function (f, v) { if (done) return; done = true; clearTimeout(timer); f(v); };
+        var timer = setTimeout(function () {
+          finish(fail, new Error('응답이 늦어지고 있어요. 잠시 뒤 다시 시도해 주세요.'));
+          if (ctl) ctl.abort();
+        }, String(k) === 'submitBooking' ? 45000 : 25000);
         fetch(API, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ fn: String(k), args: args }) })
+          body: JSON.stringify({ fn: String(k), args: args }), signal: ctl ? ctl.signal : undefined })
           .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-          .then(function (j) { if (j && j.ok) ok(j.value); else fail(new Error((j && j.error) || '요청을 처리하지 못했어요.')); })
-          .catch(function () { fail(new Error('연결이 잠시 불안정해요. 잠시 뒤 다시 시도해 주세요.')); });
+          .then(function (j) { if (j && j.ok) finish(ok, j.value); else finish(fail, new Error((j && j.error) || '요청을 처리하지 못했어요.')); })
+          .catch(function () { finish(fail, new Error('연결이 잠시 불안정해요. 잠시 뒤 다시 시도해 주세요.')); });
       };
     } });
     return p;
@@ -590,33 +599,67 @@
     }
     if (busy) { submitError('빈 시간을 찾는 중이에요. 잠시 후 다시 눌러 주세요.'); return; }
     busy = true; lockForm(true); $('submitBtn').disabled = true; $('submitBtn').textContent = '신청 중…';
-    google.script.run.withSuccessHandler(r => {
-      busy = false; $('submitBtn').disabled = false; $('submitBtn').textContent = '예약 신청하기';
-      if (r.error) { lockForm(false); submitError(r.error); if (r.refresh) $('findBtn').click(); return; }
+    // 신청 번호표(버전 29, Codex 3차): 보낼 때마다 새 번호표를 만들고, 응답이 끊기면(접수 여부 모름) 번호표를 남겨 둔다.
+    // 다음에 누르면(새로고침 뒤 포함) 새로 보내기 전에 그 번호표가 접수됐는지 먼저 확인 → 접수됐으면 그 결과를 보여 주고 끝.
+    // 그래서 응답이 끊긴 뒤 내용을 바꿔도 예약이 두 건 생기지 않는다.
+    const unlock = () => { busy = false; $('submitBtn').disabled = false; $('submitBtn').textContent = '예약 신청하기'; };
+    const clearPend = () => { try { sessionStorage.removeItem('popo_req'); } catch (e) {} };
+    const finishOk = (r, ff, note) => {
+      clearPend();
       searchSeq++;   // 혹시 남아 있는 검색 응답은 버린다(완료 화면의 지워진 요소에 접근하지 않게)
       dropDraft();
-      renderDone(r, f);
-      say('신청이 접수되었어요. 취소 코드는 ' + r.code.split('').join(' ') + ' 입니다.');
+      renderDone(r, ff, note);
+      say((note ? note + ' ' : '신청이 접수되었어요. ') + '취소 코드는 ' + r.code.split('').join(' ') + ' 입니다.');
       window.scrollTo(0, 0);
-      $('lPhone').value = f.phone; $('lOrg').value = f.org;
-    }).withFailureHandler(e => {
-      busy = false; lockForm(false); $('submitBtn').disabled = false; $('submitBtn').textContent = '예약 신청하기';
-      submitError(friendly(e, '신청 중 문제가 생겼어요.'));
-    }).submitBooking(f);
+      $('lPhone').value = ff.phone || ''; $('lOrg').value = r.org || ff.org || '';
+    };
+    const send = () => {
+      const a = new Uint8Array(12); (window.crypto || window.msCrypto).getRandomValues(a);
+      f.reqId = Array.from(a, x => ('0' + x.toString(16)).slice(-2)).join('');
+      try { sessionStorage.setItem('popo_req', JSON.stringify({ id: f.reqId, f: { org: f.org, phone: f.phone, email: f.email, movie: f.movie, kids: f.kids, teachers: f.teachers } })); } catch (e) {}
+      google.script.run.withSuccessHandler(r => {
+        unlock();
+        if (r.error) {   // 서버가 분명히 거절 → 저장되지 않았으므로 번호표를 지운다
+          clearPend(); lockForm(false); submitError(r.error); if (r.refresh) $('findBtn').click();
+          if (r.movieGone) { show($('movie'), 'center', true); $('movie').focus({ preventScroll:true }); }
+          return;
+        }
+        finishOk(r, f);
+      }).withFailureHandler(e => {
+        unlock(); lockForm(false);   // 접수 여부 모름 → 번호표를 남겨 두고 다음에 먼저 확인
+        submitError(friendly(e, '신청 중 문제가 생겼어요.') + ' [예약 신청하기]를 다시 누르면 먼저 접수됐는지 확인해 드려요. 중복 접수되지 않아요.');
+      }).submitBooking(f);
+    };
+    let pend = null; try { pend = JSON.parse(sessionStorage.getItem('popo_req') || 'null'); } catch (e) {}
+    if (pend && pend.id) {
+      google.script.run.withSuccessHandler(c => {
+        if (c && c.found) { unlock(); finishOk(c, pend.f || {}, '조금 전에 보내신 신청이 이미 접수되어 있었어요. 내용을 바꾸시려면 [예약 확인·취소]에서 취소한 뒤 다시 신청해 주세요.'); return; }
+        if (!c || !c.closed) {   // 아직 처리 중이거나 확인 실패 → 번호표를 지우지 않고 다시 누르게
+          unlock(); lockForm(false); submitError('조금 전 신청을 아직 처리하고 있어요. 잠시 뒤 [예약 신청하기]를 다시 눌러 주세요.'); return;
+        }
+        clearPend(); send();   // 서버가 그 번호표를 닫았음(앞으로도 저장 안 됨) → 지금 내용으로 새로 보낸다
+      }).withFailureHandler(() => {
+        unlock(); lockForm(false);
+        submitError('연결이 불안정해 조금 전 신청이 접수됐는지 확인하지 못했어요. 잠시 뒤 다시 눌러 주세요.');
+      }).checkRequest(pend.id);
+    } else send();
   };
 
   function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
 
   // 완료 화면: 축하 → 신청 내용 → 다음 순서 → 취소 코드(복사) → 전화·확인·홈
-  function renderDone(r, f) {
+  function renderDone(r, f, note) {
     const app = $('app'); clear(app);
     const s = el('section', 'done');
     const em = el('div', 'em', '🎉'); em.setAttribute('aria-hidden', 'true');
     const h = el('h2', null, '신청이 접수되었어요!');
+    if (note) s.appendChild(el('p', 'next', note));
     const lead = el('p', 'lead', '아이들과 만날 날을 기다릴게요.');
     const dl = el('dl', 'recap');
-    const mv = (info && f.movie === info.undecided) ? '상담 후 결정' : f.movie;
-    [['날짜', r.label + ' ' + r.start + ' 시작'], ['인원', '아이 ' + f.kids + '명 · 선생님 ' + f.teachers + '명'], ['영화', mv],
+    const saved = r.movie || f.movie;   // 서버가 실제로 저장한 영화(버전 29)
+    const mv = (info && saved === info.undecided) ? '상담 후 결정' : saved;
+    const kidsN = r.kids != null ? r.kids : f.kids, teachersN = r.teachers != null ? r.teachers : f.teachers;   // 서버가 저장한 값
+    [['날짜', r.label + ' ' + r.start + ' 시작'], ['인원', '아이 ' + kidsN + '명 · 선생님 ' + teachersN + '명'], ['영화', mv],
      ['기관', r.org || f.org], ['예약번호', r.id]].forEach(([k, v]) => { const row = el('div'); row.appendChild(el('dt', null, k)); row.appendChild(el('dd', null, v)); dl.appendChild(row); });
     const next = el('p', 'next', '점장이 연락드려 영화를 안내하고 확정해 드려요. 결제는 관람 당일 현장에서 해 주세요.');
 
