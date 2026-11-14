@@ -554,6 +554,8 @@
           t.querySelectorAll('.chip').forEach(c => { c.classList.remove('on'); c.setAttribute('aria-pressed', 'false'); });
           this.classList.add('on'); this.setAttribute('aria-pressed', 'true');
           pick.start = s; $('infoSec').classList.remove('hide');
+          // 방문 집계(버전 27): 이 화면에서 처음 시간을 고를 때 한 번만 센다. 횟수만, 개인정보 없음
+          if (!window.__pickedOnce) { window.__pickedOnce = true; try { google.script.run.withFailureHandler(() => {}).track('pick'); } catch (e) {} }
           updateSummary();
           show($('infoSec'), 'start');
           say(d.label + ' ' + s + ' 선택. 아래에 기관 정보를 입력해 주세요.');
