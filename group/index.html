@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>포포시네마 단체관람 예약</title>
+<meta name="description" content="어린이집·유치원 단체관람, 빈 시간을 보고 바로 신청하세요. 결제는 관람 당일 현장에서.">
+<meta property="og:title" content="포포시네마 단체관람 예약">
+<meta property="og:description" content="어린이집·유치원 단체관람, 빈 시간을 보고 바로 신청하세요.">
+<meta property="og:image" content="https://popo-cinema.vercel.app/og.jpg">
+<meta property="og:url" content="https://popo-cinema.vercel.app/group">
+<link rel="icon" href="/logo-mascot.png">
+<script>
+// 홈페이지(/group)에서 Apps Script 화면과 같은 코드를 쓰기 위한 대체물(버전 26).
+// google.script.run.withSuccessHandler(f).withFailureHandler(g).함수(인자) → Apps Script 웹앱 doPost로 fetch.
+// text/plain으로 보내 브라우저 사전 확인(preflight) 없이 동작한다.
+(function () {
+  var API = 'https://script.google.com/macros/s/AKfycbzypcY-bq8J232fEtC3pFHWhVH8Mw7Sb72USfwXnJfZUnkBtPei7KtsCJK6zIiEb9uj/exec';
+  function runner() {
+    var ok = function () {}, fail = function () {};
+    var p = new Proxy({}, { get: function (_, k) {
+      if (k === 'withSuccessHandler') return function (f) { ok = f; return p; };
+      if (k === 'withFailureHandler') return function (f) { fail = f; return p; };
+      return function () {
+        var args = Array.prototype.slice.call(arguments);
+        fetch(API, { method: 'POST', redirect: 'follow', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ fn: String(k), args: args }) })
+          .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+          .then(function (j) { if (j && j.ok) ok(j.value); else fail(new Error((j && j.error) || '요청을 처리하지 못했어요.')); })
+          .catch(function () { fail(new Error('연결이 잠시 불안정해요. 잠시 뒤 다시 시도해 주세요.')); });
+      };
+    } });
+    return p;
+  }
+  window.google = { script: { get run() { return runner(); } } };
+})();
+
+</script>
+
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+  /* 버전 18(11/14): 홈페이지(popo-cinema.vercel.app)와 같은 색·글꼴·모서리.
+     버튼 그라데이션은 홈페이지 색 계열에서 흰 글씨 대비 4.5:1 이상 되도록 한 단계 진하게. */
+  :root {
+    --cream:#FFF8F0; --paper:#FFFFFF; --ink:#2C2C2A; --body:#55544F; --muted:#6B6A64;
+    --line:rgba(120,70,30,.16); --line-strong:rgba(120,70,30,.32);
+    --accent:#C2410C; --accent-soft:#FFF1E6; --pink:#C21F72;
+    /* 머리글: 홈페이지 그라데이션 그대로 + 진한 갈색 글씨(11/14 점장 선택. 검정은 무겁고 흰색은 별로).
+       분홍 끝에서도 4.5:1 넘도록 #5A2410보다 한 단계 진하게(Codex 검수) → 대비 5.0~8:1 */
+    --hero:linear-gradient(160deg,#FFB347 0%,#FF7B7B 60%,#FF5CAD 100%);
+    --hero-ink:#4A1C0B;
+    --btn:linear-gradient(135deg,#CC4A12 0%,#D03A5E 100%);
+    --btn-shadow:0 6px 16px rgba(208,58,94,.25);
+    --shadow:0 2px 14px rgba(150,90,40,.09);
+    --err:#C62828; --err-soft:#FDECEC;
+    --ok:#1B6B3A; --ok-soft:#E8F5EC;
+    --off-bg:#F3ECE4; --off-text:#B0A79D;
+    --kakao:#FEE500; --kakao-ink:#3C1E1E;
+    --radius:20px; --radius-sm:14px;
+    --font:"Noto Sans KR",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  }
+  * { box-sizing:border-box; }
+  html, body { overflow-x:clip; }
+  body { margin:0; background:var(--cream); color:var(--ink); font-family:var(--font); font-size:16px; line-height:1.55; -webkit-text-size-adjust:100%; }
+  button, input, select, textarea { font:inherit; color:inherit; }
+  ::selection { background:#FFD9B8; color:var(--ink); }
+  :focus-visible { outline:3px solid var(--accent); outline-offset:2px; }
+  a { color:var(--accent); text-underline-offset:3px; }
+
+  /* 머리글 */
+  .hero { background:var(--hero); padding:14px 16px 18px; color:var(--hero-ink); }
+  .hero :focus-visible { outline-color:var(--hero-ink); }
+  .hero-in { max-width:560px; margin:0 auto; }
+  .home { display:inline-flex; align-items:center; min-height:44px; color:var(--hero-ink); font-size:14px; font-weight:700; text-decoration:none; }
+  .home:hover { text-decoration:underline; }
+  .logo { display:block; height:30px; width:auto; margin:4px 0 8px; }
+  .hero h1 { margin:0; font-size:23px; font-weight:700; letter-spacing:-0.01em; }
+  .hero p { margin:4px 0 0; font-size:14px; font-weight:500; }
+  .tabs { display:flex; gap:6px; margin-top:14px; padding:4px; background:rgba(255,255,255,.45); border-radius:999px; }
+  .tab { flex:1; min-height:44px; padding:8px 10px; border:0; border-radius:999px; background:transparent; color:var(--hero-ink); font-size:15px; font-weight:700; cursor:pointer; }
+  .tab[aria-selected="true"] { background:var(--paper); color:var(--accent); box-shadow:0 2px 8px rgba(150,90,40,.15); }
+
+  main { max-width:560px; margin:0 auto; padding:16px; }
+  section { background:var(--paper); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px 18px; margin-bottom:14px; }
+  h2 { font-size:18px; font-weight:700; margin:0 0 14px; }
+  h2 .ic { margin-right:6px; }
+  label { display:block; font-size:14px; margin:14px 0 6px; font-weight:700; }
+  input, select, textarea { width:100%; min-height:48px; padding:11px 14px; border:1.5px solid var(--line-strong); border-radius:var(--radius-sm); font-size:16px; background:var(--paper); }
+  input::placeholder, textarea::placeholder { color:var(--muted); opacity:1; }
+  input:focus-visible, select:focus-visible, textarea:focus-visible { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(194,65,12,.18); }
+  textarea { min-height:80px; resize:vertical; }
+  .row { display:flex; gap:10px; }
+  .row > div { flex:1; min-width:0; }
+  .row label { margin-top:0; }
+  .hint { font-size:13px; color:var(--muted); margin:8px 0 0; }
+
+  .btn { display:flex; align-items:center; justify-content:center; gap:6px; width:100%; min-height:54px; padding:14px; border:0; border-radius:999px;
+    background:var(--btn); color:#fff; font-size:17px; font-weight:700; margin-top:16px; cursor:pointer; box-shadow:var(--btn-shadow); text-decoration:none; }
+  .btn:hover { filter:brightness(1.05); }
+  .btn:disabled { background:#D9D2CA; color:#5E5A55; box-shadow:none; cursor:default; filter:none; }
+  .btn.ghost { background:var(--paper); color:var(--accent); border:1.5px solid var(--accent); box-shadow:none; }
+  .btn.danger { background:var(--paper); color:var(--err); border:1.5px solid var(--err); box-shadow:none; }
+
+  /* 오류: 문제가 있는 칸 바로 아래에 */
+  .invalid { border-color:var(--err) !important; background:#FFFBFB; }
+  .ferr { display:flex; gap:6px; color:var(--err); font-size:14px; font-weight:500; margin-top:6px; }
+  .ferr::before { content:'!'; flex:none; width:18px; height:18px; margin-top:2px; border-radius:50%; background:var(--err); color:#fff; font-size:12px; font-weight:700; text-align:center; line-height:18px; }
+  .err { color:var(--err); font-size:14px; font-weight:500; }
+  .err:not(:empty) { margin-top:12px; padding:12px 14px; background:var(--err-soft); border-radius:var(--radius-sm); }
+  .okmsg:not(:empty) { margin-top:12px; padding:12px 14px; background:var(--ok-soft); color:var(--ok); border-radius:var(--radius-sm); font-weight:500; }
+  .hide { display:none !important; }
+  .sr { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+
+  /* 달력·시간 */
+  .cal-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .cal-head b { font-size:17px; }
+  .cal-nav { width:44px; height:44px; border:1.5px solid var(--line-strong); border-radius:12px; background:var(--paper); font-size:20px; line-height:1; cursor:pointer; }
+  .cal-nav:disabled { opacity:.35; cursor:default; }
+  .cal { display:grid; grid-template-columns:repeat(5, minmax(0, 1fr)); gap:6px; }
+  .cal .wd { text-align:center; font-size:13px; color:var(--muted); font-weight:700; padding-bottom:2px; }
+  .cal .d { height:46px; border:1.5px solid var(--accent); border-radius:12px; background:var(--paper); font-size:16px; font-weight:700; cursor:pointer; padding:0; font-variant-numeric:tabular-nums; }
+  .cal .d:disabled { border-color:transparent; background:var(--off-bg); color:var(--off-text); font-weight:400; cursor:default; }
+  .cal .d.on { background:var(--accent); color:#fff; }
+  .cal-legend { font-size:13px; color:var(--muted); margin-top:10px; }
+  .picked { font-weight:700; margin:18px 0 4px; }
+  .slot-group { margin-top:10px; }
+  .slot-group .gl { font-size:13px; color:var(--muted); font-weight:700; margin-bottom:6px; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; }
+  .chip { min-height:44px; min-width:72px; padding:10px 14px; border:1.5px solid var(--line-strong); border-radius:999px; background:var(--paper); font-size:16px; font-weight:500; cursor:pointer; font-variant-numeric:tabular-nums; }
+  .chip.on { background:var(--accent); color:#fff; border-color:var(--accent); font-weight:700; }
+  .chip.on::before, .cal .d.on::before { content:'✓ '; }
+
+  /* 4단계 */
+  .more { margin-top:16px; border:1.5px solid var(--line); border-radius:var(--radius-sm); padding:0 14px; }
+  .more > summary { min-height:48px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; font-weight:700; font-size:15px; list-style:none; }
+  .more > summary::-webkit-details-marker { display:none; }
+  .more > summary::after { content:'펼치기'; font-size:13px; color:var(--accent); }
+  .more[open] > summary::after { content:'접기'; }
+  .more[open] { padding-bottom:14px; }
+  .more > summary .sub { font-weight:400; color:var(--muted); font-size:13px; margin-left:6px; }
+  .notice { margin:16px 0 0; padding:12px 14px 12px 32px; background:var(--accent-soft); border-radius:var(--radius-sm); }
+  .notice li { font-size:14px; margin:3px 0; color:var(--body); }
+  .agree { display:flex; gap:10px; align-items:center; min-height:52px; margin:14px 0 0; padding:10px 14px; border:1.5px solid var(--line-strong); border-radius:var(--radius-sm); font-size:15px; cursor:pointer; }
+  .agree input { width:22px; height:22px; min-height:0; flex:none; margin:0; accent-color:var(--accent); }
+  .terms { margin-top:6px; font-size:13px; color:var(--muted); }
+  .forgot { margin-top:10px; }
+  .forgot summary { cursor:pointer; color:var(--accent); min-height:40px; display:inline-flex; align-items:center; font-size:14px; }
+  .forgot .btn { margin-top:6px; }
+  .terms summary { cursor:pointer; color:var(--accent); min-height:32px; display:inline-flex; align-items:center; }
+  .terms p { margin:4px 0 0; }
+  .summary { margin-top:18px; padding:14px 16px; background:var(--accent-soft); border-radius:var(--radius-sm); }
+  .summary .t { font-size:13px; color:var(--body); font-weight:700; }
+  .summary .v { font-size:17px; font-weight:700; margin-top:2px; }
+  .summary .s { font-size:14px; color:var(--body); margin-top:2px; }
+  .summary button { margin-top:6px; padding:6px 0; min-height:36px; border:0; background:none; color:var(--accent); font-size:14px; font-weight:700; text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
+
+  /* 완료 화면 */
+  .done { text-align:center; padding:28px 18px; }
+  .done .em { font-size:44px; line-height:1; }
+  .done h2 { font-size:22px; margin:12px 0 4px; }
+  .done .lead { margin:0; color:var(--body); }
+  .recap { margin:18px 0 0; text-align:left; background:var(--cream); border-radius:var(--radius-sm); padding:6px 16px; }
+  .recap div { display:flex; gap:12px; padding:9px 0; border-bottom:1px solid var(--line); }
+  .recap div:last-child { border-bottom:0; }
+  .recap dt { flex:none; width:64px; color:var(--muted); font-size:14px; }
+  .recap dd { margin:0; font-weight:700; min-width:0; overflow-wrap:anywhere; }
+  .done .next { margin:16px 0 0; font-size:15px; color:var(--body); }
+  .codebox { margin-top:18px; padding:16px; border:1.5px dashed var(--accent); border-radius:var(--radius-sm); background:var(--accent-soft); }
+  .codebox .t { font-size:14px; font-weight:700; }
+  .code { font-size:30px; font-weight:700; letter-spacing:6px; margin:6px 0 2px; font-variant-numeric:tabular-nums; }
+  .copy { min-height:40px; padding:6px 16px; border:1.5px solid var(--accent); border-radius:999px; background:var(--paper); color:var(--accent); font-size:14px; font-weight:700; cursor:pointer; }
+  .done .hint { text-align:center; }
+  .linkbtn { border:0; background:none; padding:4px 0; min-height:36px; color:var(--accent); font-size:14px; font-weight:700; text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
+
+  /* 조회 */
+  .item .line { font-size:15px; margin:4px 0; }
+  .st { display:inline-block; padding:3px 12px; border-radius:999px; background:#EFEAE4; color:var(--body); font-size:13px; font-weight:700; margin-bottom:6px; }
+  .st[data-s="대기"] { background:#FFF1D6; color:#8A4B00; }
+  .st[data-s="확정"] { background:var(--ok-soft); color:var(--ok); }
+  .st[data-s="취소"], .st[data-s="거절"] { background:#EFEAE4; color:#5E5A55; }
+
+  /* 문의: 첫 화면에 띄우지 않는다(11/14 점장). 막힐 때만 전화 링크, 맨 아래에 작은 줄. */
+  .tel-inline { display:inline-flex; align-items:center; min-height:36px; margin-left:4px; font-weight:700; white-space:nowrap; }
+  .foot { max-width:560px; margin:8px auto 0; padding:8px 16px 28px; text-align:center; font-size:13px; color:var(--muted); }
+  .foot a { display:inline-flex; align-items:center; min-height:40px; padding:0 6px; color:var(--body); font-weight:700; }
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-in">
+    <a class="home" href="https://popo-cinema.vercel.app/">← 포포시네마 홈</a>
+    <img class="logo" src="https://popo-cinema.vercel.app/logo-line.png" width="207" height="30" alt="포포시네마">
+    <h1>단체관람 예약</h1>
+    <p>날짜와 시간을 직접 골라 신청하시면, 점장이 연락드려 영화를 안내하고 확정해 드려요.</p>
+    <div class="tabs" role="tablist" aria-label="예약 메뉴">
+      <button type="button" class="tab" id="tabBook" role="tab" aria-selected="true" aria-controls="app">예약 신청</button>
+      <button type="button" class="tab" id="tabLook" role="tab" aria-selected="false" aria-controls="look">예약 확인·취소</button>
+    </div>
+  </div>
+</header>
+<!-- 화면 읽기 프로그램 안내: 신청 완료 화면으로 바뀌어도 지워지지 않도록 본문 밖에 둔다 -->
+<div class="sr" id="status" role="status" aria-live="polite"></div>
+<main id="look" class="hide" role="tabpanel" aria-labelledby="tabLook">
+  <section>
+    <h2><span class="ic" aria-hidden="true">🔎</span>예약 확인·취소</h2>
+    <label for="lPhone">연락처</label><input id="lPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="신청할 때 입력한 번호">
+    <label for="lOrg">기관명</label><input id="lOrg" autocomplete="organization" placeholder="신청할 때 입력한 기관명">
+    <p class="hint">띄어쓰기·괄호는 달라도 괜찮아요. 기관명 전체가 기억나지 않으면 앞부분과 취소 코드를 같이 넣어 주세요.</p>
+    <!-- 조회가 여러 번 실패해 막혔을 때만 보인다: 취소 코드가 있으면 바로 조회 -->
+    <div id="lCodeWrap" class="hide">
+      <label for="lCode">취소 코드 (영어·숫자 6자리)</label>
+      <input id="lCode" autocomplete="off" maxlength="8" autocapitalize="characters" spellcheck="false" style="text-transform:uppercase" placeholder="예: K7PX2M (완료 화면·메일의 코드)">
+    </div>
+    <button type="button" class="btn" id="lookBtn">예약 조회</button>
+    <div class="err" id="lookErr" role="alert" aria-live="assertive"></div>
+    <div class="okmsg" id="lookOk" role="status"></div>
+  </section>
+  <div id="lookList"></div>
+</main>
+<main id="app" role="tabpanel" aria-labelledby="tabBook">
+  <section>
+    <h2><span class="ic" aria-hidden="true">👧</span>인원</h2>
+    <div class="row">
+      <div><label for="kids">아이</label><input id="kids" type="number" min="0" inputmode="numeric" placeholder="예: 20"></div>
+      <div><label for="teachers">선생님</label><input id="teachers" type="number" min="0" inputmode="numeric" placeholder="예: 4"></div>
+    </div>
+    <p class="hint" id="minHint">아이 15명 이상, 아이가 적으면 선생님 포함 15명 이상부터 신청할 수 있어요.</p>
+  </section>
+
+  <section>
+    <h2><span class="ic" aria-hidden="true">🎬</span>영화</h2>
+    <label for="movie" class="sr">관람할 영화</label>
+    <select id="movie"></select>
+    <p class="hint">상영작이 많아 확정 연락 때 함께 안내해 드려요. <span id="pdfWrap">미리 보시려면 <a id="pdf" target="_blank" rel="noopener">단체관람 안내 자료</a>를 확인해 주세요.</span></p>
+    <button type="button" class="btn" id="findBtn">예약 가능한 날짜 보기</button>
+    <div class="err" id="findErr" role="alert" aria-live="assertive"></div>
+  </section>
+
+  <section id="dateSec" class="hide">
+    <h2><span class="ic" aria-hidden="true">📅</span>날짜와 시간</h2>
+    <div id="dates"></div>
+    <div id="timeWrap" class="hide">
+      <div class="picked" id="pickedLabel"></div>
+      <div id="times"></div>
+    </div>
+    <p class="hint" id="noDays"></p>
+  </section>
+
+  <section id="infoSec" class="hide">
+    <h2><span class="ic" aria-hidden="true">🏫</span>기관 정보</h2>
+    <label for="org">기관명</label><input id="org" autocomplete="organization" placeholder="예: 포포어린이집">
+    <label for="name">담당 선생님</label><input id="name" autocomplete="name" placeholder="예: 김포포">
+    <label for="phone">연락처</label><input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="010-0000-0000">
+
+    <details class="more" id="more">
+      <summary>추가 정보 <span class="sub">(선택) 이메일·야광·요청사항</span></summary>
+      <label for="email">이메일</label><input id="email" type="email" inputmode="email" autocomplete="email" placeholder="접수·확정 안내를 메일로 받으려면 입력">
+      <p class="hint">남겨 주시면 접수, 확정, 변경, 취소 안내를 메일로 보내 드려요.</p>
+      <label for="glow">야광 프로그램</label>
+      <select id="glow"><option>상담 후 결정</option><option>희망</option><option>안함</option></select>
+      <p class="hint">상영 전 어둠 속에서 미러볼과 함께 약 10분간 춤추는 시간이에요. 요금은 확정 연락 때 안내해 드려요.</p>
+      <label for="note">요청사항</label><textarea id="note" maxlength="500" placeholder="예: 휠체어 이용 아이 1명, 11시 30분까지 퇴장 필요"></textarea>
+    </details>
+
+    <ul class="notice">
+      <li>결제는 관람 당일 <b>현장 결제</b>예요.</li>
+      <li>신청 후 점장이 연락드려 영화를 안내하고 <b>확정</b>해요. 연락 전까지는 신청 상태예요.</li>
+      <li>취소·변경은 관람 <b>7일 전까지</b> 연락 부탁드려요.</li>
+    </ul>
+    <label class="agree"><input type="checkbox" id="agree"><span>[필수] 개인정보 수집·이용에 동의해요</span></label>
+    <details class="terms"><summary>무엇을 수집하나요?</summary>
+      <p>예약 확인과 연락을 위해 기관명, 담당자 이름, 연락처, 이메일(입력한 경우)을 수집하며 관람일로부터 <span id="keepTxt">1년</span>간 보관 후 파기합니다.</p>
+    </details>
+
+    <div class="summary" id="summary" aria-live="polite">
+      <div class="t">신청 내용</div>
+      <div class="v" id="sumWhen"></div>
+      <div class="s" id="sumWho"></div>
+      <button type="button" id="sumChange">날짜·시간 바꾸기</button>
+    </div>
+    <div class="err" id="submitErr" role="alert" aria-live="assertive"></div>
+    <button type="button" class="btn" id="submitBtn">예약 신청하기</button>
+  </section>
+</main>
+
+<footer class="foot">
+  대관·기타 문의
+  <a id="telLink" href="tel:07048006068">📞 <span id="telTxt">070-4800-6068</span></a>
+  <a href="https://pf.kakao.com/_FVbxiX/chat" target="_blank" rel="noopener">💬 카카오톡</a>
+</footer>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const HOME = 'https://popo-cinema.vercel.app/';
+  let info = null, pick = { date:'', start:'' }, busy = false, pickedDay = null;
+  let searchSeq = 0; // 조건을 바꾸면 올라가서, 늦게 온 예전 검색 결과를 버린다
+  function say(t) {
+    const s = $('status');
+    if (!s) return;
+    s.textContent = ''; setTimeout(() => { s.textContent = t; }, 50);
+  }
+  function phone() { return (info && info.phone) || '070-4800-6068'; }
+  // 서버 오류의 영어 원문은 고객에게 보이지 않게 하고, 기록에만 남긴다.
+  function friendly(e, what) {
+    try { console.error(what, e && e.message); } catch (x) {}
+    return what + ' 잠시 후 다시 시도해 주시고, 계속 안 되면 ' + phone() + '로 전화 주세요.';
+  }
+  // 단계 이동은 부드럽게(움직임 줄이기 설정이면 바로), 오류는 항상 바로 그 자리로.
+  const calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // 오류 문구가 전화·연락을 안내하면 바로 걸 수 있는 링크를 붙인다(문의 버튼은 이렇게 막힐 때만 보인다).
+  function setErr(box, msg) {
+    box.textContent = msg;
+    if (msg && /전화|연락|문의/.test(msg)) {
+      const a = document.createElement('a'); a.className = 'tel-inline'; a.href = 'tel:' + phone().replace(/\D/g, ''); a.textContent = '📞 전화 걸기';
+      box.appendChild(document.createTextNode(' ')); box.appendChild(a);
+    }
+  }
+  function show(el, block, now) { if (el && el.scrollIntoView) el.scrollIntoView({ behavior:(now || calm) ? 'auto' : 'smooth', block:block || 'center' }); }
+
+  // 칸 바로 아래에 오류를 띄우고 그 칸으로 화면과 초점을 옮긴다.
+  function fieldErr(id, msg) {
+    const el = $(id); if (!el) return;
+    let m = $(id + 'Err');
+    if (!m) { m = document.createElement('div'); m.className = 'ferr'; m.id = id + 'Err'; m.setAttribute('role', 'alert'); el.insertAdjacentElement('afterend', m); }
+    m.textContent = msg;
+    el.classList.add('invalid'); el.setAttribute('aria-invalid', 'true'); el.setAttribute('aria-describedby', m.id);
+    show(el, 'center', true); el.focus({ preventScroll:true });
+  }
+  function clearErr(id) {
+    const el = $(id), m = $(id + 'Err');
+    if (m) m.remove();
+    if (el) { el.classList.remove('invalid'); el.removeAttribute('aria-invalid'); el.removeAttribute('aria-describedby'); }
+  }
+  ['kids','teachers','org','name','phone','email','agree'].forEach(id => {
+    $(id).addEventListener(id === 'agree' ? 'change' : 'input', () => clearErr(id));
+  });
+
+  // 입력 유지(버전 21): 선생님이 카톡 등으로 잠깐 나갔다 와서 페이지가 새로 열려도 적은 내용이 남게 한다.
+  // 이 탭(sessionStorage)에만 두고, 신청이 끝나면 지운다. 날짜·시간은 빈자리가 바뀔 수 있어 다시 고른다.
+  const KEEP = ['kids','teachers','movie','org','name','phone','email','glow','note'];
+  const KEEP_KEY = 'popo_group_draft';
+  // 3시간이 지나면 버린다(신청을 포기한 경우 연락처 등이 오래 남지 않게). 탭을 닫아도 지워진다.
+  const KEEP_MS = 3 * 60 * 60 * 1000;
+  function saveDraft() { try { const d = { at: Date.now() }; KEEP.forEach(id => { d[id] = $(id).value; }); sessionStorage.setItem(KEEP_KEY, JSON.stringify(d)); } catch (e) {} }
+  function loadDraft() {
+    try { const d = JSON.parse(sessionStorage.getItem(KEEP_KEY) || 'null'); if (d && Date.now() - (d.at || 0) < KEEP_MS) return d; sessionStorage.removeItem(KEEP_KEY); return null; }
+    catch (e) { return null; }
+  }
+  function dropDraft() { try { sessionStorage.removeItem(KEEP_KEY); } catch (e) {} }
+  const draft = loadDraft();
+  // 페이지를 열어 둔 채 3시간 동안 아무것도 안 적으면, 저장값과 화면의 기관·담당자·연락처·이메일·요청사항도 지운다.
+  // 화면으로 돌아올 때와 10분마다 확인한다.
+  let lastEdit = draft ? draft.at : Date.now();
+  const PERSONAL = ['org','name','phone','email','note'];
+  function sweep() {
+    if (Date.now() - lastEdit < KEEP_MS || submitting) return;
+    dropDraft();
+    if (PERSONAL.some(id => $(id) && $(id).value)) { PERSONAL.forEach(id => { if ($(id)) $(id).value = ''; }); say('오래 사용하지 않아 적어 두신 연락처 정보를 지웠어요.'); }
+  }
+  KEEP.forEach(id => $(id).addEventListener(id === 'movie' || id === 'glow' ? 'change' : 'input', () => { lastEdit = Date.now(); }));
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) sweep(); });
+  setInterval(sweep, 10 * 60 * 1000);
+  if (draft) KEEP.forEach(id => { if (id !== 'movie' && draft[id] != null && draft[id] !== '') $(id).value = draft[id]; });
+  if (draft && (draft.email || draft.note || (draft.glow && draft.glow !== '상담 후 결정'))) $('more').open = true;
+  KEEP.forEach(id => $(id).addEventListener(id === 'movie' || id === 'glow' ? 'change' : 'input', saveDraft));
+
+  function clear(el) { while (el.firstChild) el.removeChild(el.firstChild); }
+  function chip(text, on, onClick) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'chip' + (on ? ' on' : ''); b.textContent = text; b.onclick = onClick;
+    return b;
+  }
+  function resetPick() {
+    pick = { date:'', start:'' }; pickedDay = null;
+    searchSeq++;
+    if (busy) { busy = false; $('findBtn').disabled = false; $('findBtn').textContent = '예약 가능한 날짜 보기'; }
+    ['dateSec','infoSec','timeWrap'].forEach(id => $(id).classList.add('hide'));
+  }
+
+  google.script.run.withSuccessHandler(r => {
+    info = r;
+    const sel = $('movie');
+    const o0 = document.createElement('option'); o0.value = r.undecided; o0.textContent = '상담 후 결정 (추천)'; sel.appendChild(o0);
+    r.movies.forEach(m => {
+      const o = document.createElement('option'); o.value = m.name;
+      o.textContent = m.name + (m.runtime ? ' · ' + m.runtime + '분' : ''); sel.appendChild(o);
+    });
+    if (r.pdf) $('pdf').href = r.pdf; else { $('pdf').removeAttribute('href'); $('pdfWrap').classList.add('hide'); }
+    if (r.phone) { $('telLink').href = 'tel:' + r.phone.replace(/\D/g, ''); $('telTxt').textContent = r.phone; }
+    $('minHint').textContent = '아이 ' + r.minPeople + '명 이상, 아이가 적으면 선생님 포함 ' + r.minPeople +
+      '명 이상부터 신청할 수 있어요. 관람일 ' + r.deadline + '일 전까지 신청 가능해요.';
+    if (draft && draft.movie && [...sel.options].some(o => o.value === draft.movie)) sel.value = draft.movie;
+    if (r.keepDays) $('keepTxt').textContent = r.keepDays % 365 === 0 ? (r.keepDays / 365) + '년' : r.keepDays + '일';
+    $('movie').disabled = false; $('findBtn').disabled = false; $('findBtn').textContent = '예약 가능한 날짜 보기';
+  }).withFailureHandler(e => {
+    $('findBtn').textContent = '예약 가능한 날짜 보기';
+    $('movie').disabled = false; $('findBtn').disabled = false;
+    setErr($('findErr'), friendly(e, '예약 정보를 불러오지 못했어요. 새로고침해 주세요.'));
+  }).getPublicInfo();
+  // 처음 정보가 올 때까지 버튼을 잠가 두고 불러오는 중임을 보여준다.
+  $('movie').disabled = true; $('findBtn').disabled = true; $('findBtn').textContent = '불러오는 중…';
+
+  ['kids','teachers','movie'].forEach(id => $(id).addEventListener('change', () => { if (!submitting) resetPick(); }));
+
+  // 신청을 보내는 동안에는 인원·영화·날짜·시간을 바꿀 수 없게 잠근다(늦게 온 검색 결과와 섞이지 않게).
+  let submitting = false;
+  function lockForm(on) {
+    submitting = on;
+    ['kids', 'teachers', 'movie', 'findBtn', 'sumChange'].forEach(id => { if ($(id)) $(id).disabled = on; });
+    const sec = $('dateSec');
+    if (!sec) return;
+    sec.style.pointerEvents = on ? 'none' : '';
+    sec.setAttribute('aria-disabled', on ? 'true' : 'false');
+    // 날짜·시간·월 이동 버튼을 실제로 비활성화(키보드 포함). 풀 때는 원래 상태로 되돌린다(원래 못 누르던 날짜는 계속 못 누름).
+    sec.querySelectorAll('button').forEach(b => {
+      if (on) { b.dataset.wasDisabled = b.disabled ? '1' : '0'; b.disabled = true; }
+      else if (b.dataset.wasDisabled !== undefined) { b.disabled = b.dataset.wasDisabled === '1'; delete b.dataset.wasDisabled; }
+    });
+  }
+
+  // 인원 칸을 먼저 확인해 5초 검색을 헛되이 돌리지 않는다(최소 인원 판단은 서버가 한다).
+  function checkPeople() {
+    const k = $('kids').value.trim(), t = $('teachers').value.trim();
+    if (!/^\d+$/.test(k)) { fieldErr('kids', '아이 인원을 숫자로 입력해 주세요.'); return false; }
+    if (!/^\d+$/.test(t)) { fieldErr('teachers', '선생님 인원을 숫자로 입력해 주세요. (안 오시면 0)'); return false; }
+    return true;
+  }
+
+  $('findBtn').onclick = () => {
+    if (busy) return;
+    $('findErr').textContent = '';
+    if (!checkPeople()) return;
+    resetPick(); busy = true; $('findBtn').disabled = true; $('findBtn').textContent = '빈 시간 찾는 중… (5초쯤 걸려요)';
+    say('예약 가능한 날짜를 찾고 있어요.');
+    const seq = searchSeq;
+    google.script.run.withSuccessHandler(r => {
+      if (seq !== searchSeq || !$('dateSec')) return; // 그 사이 인원·영화가 바뀌었거나, 이미 신청 완료 화면
+      busy = false; $('findBtn').disabled = false; $('findBtn').textContent = '예약 가능한 날짜 보기';
+      if (r.error) { setErr($('findErr'), r.error); show($('findErr'), 'center', true); return; }
+      renderDays(r.days);
+      show($('dateSec'), 'start');
+      say(r.days.length ? '예약 가능한 날짜 ' + r.days.length + '일을 찾았어요. 달력에서 골라 주세요.' : '지금 신청 가능한 날짜가 없어요.');
+    }).withFailureHandler(e => {
+      if (seq !== searchSeq || !$('findBtn')) return;
+      busy = false; $('findBtn').disabled = false; $('findBtn').textContent = '예약 가능한 날짜 보기';
+      setErr($('findErr'), friendly(e, '빈 시간을 찾지 못했어요.'));
+    }).getAvailability($('kids').value, $('teachers').value, $('movie').value);
+  };
+
+  let calDays = {}, calMonths = [], calIdx = 0;
+
+  function renderDays(days) {
+    $('dateSec').classList.remove('hide');
+    const nd = $('noDays'); clear(nd);
+    if (!days.length) {
+      nd.appendChild(document.createTextNode('지금 신청 가능한 날짜가 없어요. 다른 인원이나 날짜가 가능한지 '));
+      const a = document.createElement('a'); a.href = 'tel:' + phone().replace(/\D/g, ''); a.textContent = phone();
+      nd.appendChild(a); nd.appendChild(document.createTextNode('로 문의해 주세요.'));
+    }
+    calDays = {}; calMonths = [];
+    days.forEach(d => { calDays[d.date] = d; const m = d.date.slice(0, 7); if (calMonths.indexOf(m) < 0) calMonths.push(m); });
+    calIdx = 0;
+    renderMonth();
+  }
+
+  // 평일(월~금)만 보이는 월 달력. 신청 가능한 날만 누를 수 있다.
+  function renderMonth() {
+    const box = $('dates'); clear(box);
+    if (!calMonths.length) return;
+    const ym = calMonths[calIdx], y = Number(ym.slice(0, 4)), m = Number(ym.slice(5, 7));
+    const head = document.createElement('div'); head.className = 'cal-head';
+    const prev = document.createElement('button'); prev.type = 'button'; prev.className = 'cal-nav'; prev.textContent = '‹';
+    const next = document.createElement('button'); next.type = 'button'; next.className = 'cal-nav'; next.textContent = '›';
+    prev.disabled = calIdx === 0; next.disabled = calIdx === calMonths.length - 1;
+    prev.setAttribute('aria-label', '이전 달'); next.setAttribute('aria-label', '다음 달');
+    prev.onclick = () => { if (submitting) return; calIdx--; renderMonth(); focusIn('.cal-nav', 0); };
+    next.onclick = () => { if (submitting) return; calIdx++; renderMonth(); focusIn('.cal-nav', 1); };
+    const title = document.createElement('b'); title.textContent = y + '년 ' + m + '월';
+    head.appendChild(prev); head.appendChild(title); head.appendChild(next); box.appendChild(head);
+
+    // 평소엔 월~금 5칸. 점장이 주말을 열어 둔 달만 일~토 7칸으로 보여준다.
+    const dowOf = day => new Date(Date.UTC(y, m - 1, day)).getUTCDay();
+    const keyOf = day => ym + '-' + String(day).padStart(2, '0');
+    const last = new Date(Date.UTC(y, m, 0)).getUTCDate();
+    let weekend = false;
+    for (let day = 1; day <= last; day++) { const w = dowOf(day); if ((w === 0 || w === 6) && calDays[keyOf(day)]) weekend = true; }
+    const cols = weekend ? [0, 1, 2, 3, 4, 5, 6] : [1, 2, 3, 4, 5];
+    const grid = document.createElement('div'); grid.className = 'cal';
+    grid.style.gridTemplateColumns = 'repeat(' + cols.length + ', minmax(0, 1fr))';
+    cols.forEach(w => { const e = document.createElement('div'); e.className = 'wd'; e.textContent = '일월화수목금토'[w]; grid.appendChild(e); });
+    // 첫 달은 신청 가능한 첫날이 들어 있는 주부터 보여준다(지난 주는 숨김).
+    const firstKey = Object.keys(calDays).sort()[0];
+    let startDay = 1;
+    if (calIdx === 0 && firstKey.slice(0, 7) === ym) {
+      const fd = Number(firstKey.slice(8, 10));
+      startDay = Math.max(1, fd - dowOf(fd));
+    }
+    let lead = true;
+    for (let day = startDay; day <= last; day++) {
+      const dow = dowOf(day);
+      if (cols.indexOf(dow) < 0) continue;
+      if (lead) { for (let k = 0; k < cols.indexOf(dow); k++) grid.appendChild(document.createElement('div')); lead = false; }
+      const key = keyOf(day);
+      const d = calDays[key];
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'd' + (pick.date === key ? ' on' : ''); b.textContent = day;
+      b.setAttribute('aria-label', m + '월 ' + day + '일 ' + '일월화수목금토'[dow] + '요일' + (d ? ', 신청 가능' : ', 신청 불가'));
+      if (pick.date === key) b.setAttribute('aria-pressed', 'true');
+      if (!d) b.disabled = true;
+      else b.onclick = () => { if (!submitting) pickDay(d); };
+      grid.appendChild(b);
+    }
+    box.appendChild(grid);
+    const cnt = Object.keys(calDays).filter(k => k.slice(0, 7) === ym).length;
+    const lg = document.createElement('div'); lg.className = 'cal-legend';
+    lg.textContent = '이달 신청 가능 ' + cnt + '일 · 주황 테두리 날짜만 신청할 수 있어요. 주말·공휴일·휴무일은 빠져 있어요.';
+    box.appendChild(lg);
+  }
+
+  // 달력을 다시 그린 뒤 키보드 초점을 원래 자리(달 이동 버튼·선택한 날짜)로 돌려놓는다.
+  function focusIn(sel, i) {
+    const list = $('dates').querySelectorAll(sel);
+    const el = list[i || 0];
+    if (el && !el.disabled) el.focus({ preventScroll:true });
+  }
+
+  function updateSummary() {
+    if (!pickedDay || !pick.start) return;
+    const mv = $('movie').value, mvTxt = (info && mv === info.undecided) ? '영화는 상담 후 결정' : '영화: ' + mv;
+    $('sumWhen').textContent = pickedDay.label + ' ' + pick.start + ' 시작';
+    $('sumWho').textContent = '아이 ' + $('kids').value + '명 · 선생님 ' + $('teachers').value + '명 · ' + mvTxt;
+  }
+  $('sumChange').onclick = () => { if (!submitting) { show($('dateSec'), 'start'); const on = $('times').querySelector('.chip.on') || $('dates').querySelector('.d.on'); if (on) on.focus({ preventScroll:true }); } };
+
+  function pickDay(d) {
+    if (submitting) return;
+    pick = { date:d.date, start:'' }; pickedDay = d; $('infoSec').classList.add('hide');
+    renderMonth();
+    focusIn('.d.on');
+    $('pickedLabel').textContent = d.label + ' 시작 시간';
+    const t = $('times'); clear(t); $('timeWrap').classList.remove('hide');
+    // 오전·오후로 나눠 보여준다(선생님들이 점심·낮잠 시간 기준으로 고르기 쉽게).
+    const groups = [['오전', d.slots.filter(s => Number(s.slice(0, 2)) < 12)], ['오후', d.slots.filter(s => Number(s.slice(0, 2)) >= 12)]];
+    groups.forEach(([name, list]) => {
+      if (!list.length) return;
+      const g = document.createElement('div'); g.className = 'slot-group'; g.setAttribute('role', 'group'); g.setAttribute('aria-label', name);
+      const gl = document.createElement('div'); gl.className = 'gl'; gl.textContent = name; gl.setAttribute('aria-hidden', 'true');
+      const row = document.createElement('div'); row.className = 'chips';
+      list.forEach(s => {
+        const b = chip(s, false, function () {
+          if (submitting) return;
+          t.querySelectorAll('.chip').forEach(c => { c.classList.remove('on'); c.setAttribute('aria-pressed', 'false'); });
+          this.classList.add('on'); this.setAttribute('aria-pressed', 'true');
+          pick.start = s; $('infoSec').classList.remove('hide');
+          updateSummary();
+          show($('infoSec'), 'start');
+          say(d.label + ' ' + s + ' 선택. 아래에 기관 정보를 입력해 주세요.');
+        });
+        b.setAttribute('aria-pressed', 'false');
+        b.setAttribute('aria-label', d.label + ' ' + s + ' 시작');
+        row.appendChild(b);
+      });
+      g.appendChild(gl); g.appendChild(row); t.appendChild(g);
+    });
+    show($('timeWrap'));
+    say(d.label + ' 선택. 시작 시간 ' + d.slots.length + '개 중에서 골라 주세요.');
+  }
+
+  function submitError(msg) { setErr($('submitErr'), msg); show($('submitErr'), 'center', true); }
+
+  $('submitBtn').onclick = () => {
+    if (busy) return;
+    $('submitErr').textContent = '';
+    const f = { kids:$('kids').value, teachers:$('teachers').value, movie:$('movie').value, date:pick.date, start:pick.start,
+      org:$('org').value, name:$('name').value, phone:$('phone').value, email:$('email').value.trim(), glow:$('glow').value, note:$('note').value, agree:$('agree').checked };
+    if (!f.date || !f.start) { submitError('날짜와 시간을 선택해 주세요.'); return; }
+    if (!f.org.trim()) { fieldErr('org', '기관명을 입력해 주세요.'); return; }
+    if (!f.name.trim()) { fieldErr('name', '담당 선생님 이름을 입력해 주세요.'); return; }
+    if (!/^0\d{8,10}$/.test(f.phone.replace(/\D/g, ''))) { fieldErr('phone', '연락처를 0으로 시작하는 번호로 입력해 주세요. (예: 010-1234-5678)'); return; }
+    if (f.email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.email)) { $('more').open = true; fieldErr('email', '이메일 주소를 다시 확인해 주세요. (선택 항목이라 비워도 돼요)'); return; }
+    if (!f.agree) {
+      const m = $('agreeErr') || document.createElement('div');
+      m.className = 'ferr'; m.id = 'agreeErr'; m.setAttribute('role', 'alert'); m.textContent = '개인정보 수집·이용에 동의해 주세요.';
+      $('agree').closest('label').insertAdjacentElement('afterend', m);
+      $('agree').setAttribute('aria-invalid', 'true'); show($('agree'), 'center', true); $('agree').focus({ preventScroll:true }); return;
+    }
+    if (busy) { submitError('빈 시간을 찾는 중이에요. 잠시 후 다시 눌러 주세요.'); return; }
+    busy = true; lockForm(true); $('submitBtn').disabled = true; $('submitBtn').textContent = '신청 중…';
+    google.script.run.withSuccessHandler(r => {
+      busy = false; $('submitBtn').disabled = false; $('submitBtn').textContent = '예약 신청하기';
+      if (r.error) { lockForm(false); submitError(r.error); if (r.refresh) $('findBtn').click(); return; }
+      searchSeq++;   // 혹시 남아 있는 검색 응답은 버린다(완료 화면의 지워진 요소에 접근하지 않게)
+      dropDraft();
+      renderDone(r, f);
+      say('신청이 접수되었어요. 취소 코드는 ' + r.code.split('').join(' ') + ' 입니다.');
+      window.scrollTo(0, 0);
+      $('lPhone').value = f.phone; $('lOrg').value = f.org;
+    }).withFailureHandler(e => {
+      busy = false; lockForm(false); $('submitBtn').disabled = false; $('submitBtn').textContent = '예약 신청하기';
+      submitError(friendly(e, '신청 중 문제가 생겼어요.'));
+    }).submitBooking(f);
+  };
+
+  function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+  // 완료 화면: 축하 → 신청 내용 → 다음 순서 → 취소 코드(복사) → 전화·확인·홈
+  function renderDone(r, f) {
+    const app = $('app'); clear(app);
+    const s = el('section', 'done');
+    const em = el('div', 'em', '🎉'); em.setAttribute('aria-hidden', 'true');
+    const h = el('h2', null, '신청이 접수되었어요!');
+    const lead = el('p', 'lead', '아이들과 만날 날을 기다릴게요.');
+    const dl = el('dl', 'recap');
+    const mv = (info && f.movie === info.undecided) ? '상담 후 결정' : f.movie;
+    [['날짜', r.label + ' ' + r.start + ' 시작'], ['인원', '아이 ' + f.kids + '명 · 선생님 ' + f.teachers + '명'], ['영화', mv],
+     ['기관', r.org || f.org], ['예약번호', r.id]].forEach(([k, v]) => { const row = el('div'); row.appendChild(el('dt', null, k)); row.appendChild(el('dd', null, v)); dl.appendChild(row); });
+    const next = el('p', 'next', '점장이 연락드려 영화를 안내하고 확정해 드려요. 결제는 관람 당일 현장에서 해 주세요.');
+
+    const box = el('div', 'codebox');
+    box.appendChild(el('div', 't', '온라인 취소 코드'));
+    const code = el('div', 'code', r.code); code.id = 'doneCode';
+    const copy = el('button', 'copy', '코드 복사'); copy.type = 'button';
+    copy.onclick = () => {
+      const done = () => { copy.textContent = '복사했어요'; say('취소 코드를 복사했어요.'); };
+      const fallback = () => { const range = document.createRange(); range.selectNodeContents(code); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range); copy.textContent = '코드를 길게 눌러 복사해 주세요'; };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(r.code).then(done, fallback); else fallback();
+    };
+    box.appendChild(code); box.appendChild(copy);
+    box.appendChild(el('p', 'hint', '예약을 온라인으로 취소할 때 필요해요. 이 화면을 캡처해 두셔도 좋아요.'));
+
+    const mail = el('p', 'hint', r.mail === 'sent' ? f.email + '로 예약번호와 취소 코드를 담은 안내 메일을 보냈어요.'
+      : r.mail === 'fail' ? '안내 메일은 보내지 못했어요. 신청은 정상 접수됐으니 이 화면을 캡처해 두세요.' : '');
+
+    const tel = el('a', 'btn', '📞 ' + phone() + ' 전화하기'); tel.href = 'tel:' + phone().replace(/\D/g, '');
+    const look = el('button', 'linkbtn', '예약 확인·취소 화면으로'); look.type = 'button'; look.onclick = () => showTab(true);
+    const home = el('a', 'btn ghost', '포포시네마 홈으로'); home.href = HOME;
+    const lookP = el('p', 'hint'); lookP.appendChild(look);
+
+    [em, h, lead, dl, next, box, mail, tel, home, lookP].forEach(x => { if (x !== mail || mail.textContent) s.appendChild(x); });
+    app.appendChild(s);
+  }
+
+  /* ---- 예약 확인·취소 ---- */
+  function showTab(look) {
+    $('look').classList.toggle('hide', !look); $('app').classList.toggle('hide', look);
+    $('tabLook').setAttribute('aria-selected', look ? 'true' : 'false'); $('tabBook').setAttribute('aria-selected', look ? 'false' : 'true');
+    window.scrollTo(0, 0);
+  }
+  $('tabBook').onclick = () => showTab(false);
+  $('tabLook').onclick = () => showTab(true);
+
+  function lookup(okText) {
+    $('lookErr').textContent = ''; $('lookOk').textContent = ''; $('lookBtn').disabled = true; $('lookBtn').textContent = '조회 중…';
+    google.script.run.withSuccessHandler(r => {
+      $('lookBtn').disabled = false; $('lookBtn').textContent = '예약 조회';
+      const box = $('lookList'); clear(box);
+      const askCode = r.limited || r.needCode;
+      if (askCode) { $('lCodeWrap').classList.remove('hide'); }
+      if (r.error) { setErr($('lookErr'), r.error); if (askCode) $('lCode').focus(); return; }
+      if (typeof okText === 'string') { $('lookOk').textContent = okText; say(okText); }
+      if (!r.list.length) {
+        setErr($('lookErr'), (r.orgMismatch
+          ? '이 연락처로 신청된 예약은 있는데 기관명이 달라요. 신청 때 적은 기관명(예: 어린이집 이름의 앞부분)으로 다시 조회해 주세요.'
+          : '조회된 예약이 없어요. 신청 때 적은 연락처와 기관명을 확인해 주세요. 띄어쓰기는 달라도 괜찮아요.') +
+          (r.phone ? ' 그래도 안 나오면 ' + r.phone + '로 연락해 주세요.' : ''));
+        return;
+      }
+      r.list.forEach(b => {
+        const s = el('section', 'item');
+        const st = el('span', 'st', b.status === '대기' ? '신청 접수(확정 전)' : b.status); st.dataset.s = b.status;
+        s.appendChild(st);
+        [b.label + ' ' + b.start, '영화: ' + b.movie, '아이 ' + b.kids + '명 · 선생님 ' + b.teachers + '명', '예약번호 ' + b.id]
+          .forEach(t => s.appendChild(el('div', 'line', t)));
+        if (b.canCancel) {
+          const lab = el('label', null, '취소 코드 (영어·숫자 6자리)');
+          const code = document.createElement('input'); code.autocomplete = 'off'; code.maxLength = 8; code.setAttribute('autocapitalize', 'characters'); code.spellcheck = false; // 코드는 영어 대문자+숫자라 숫자 자판을 띄우지 않는다
+          code.placeholder = '예: K7PX2M (완료 화면·메일의 코드)'; code.style.textTransform = 'uppercase';
+          code.id = 'code_' + b.id; lab.htmlFor = code.id;
+          const btn = el('button', 'btn danger', '예약 취소하기'); btn.type = 'button';
+          const msg = el('div', 'err'); msg.setAttribute('role', 'alert');
+          btn.onclick = () => {
+            msg.textContent = '';
+            if (!code.value.trim()) { setErr(msg, '취소 코드를 입력해 주세요. 코드를 잊으셨으면 ' + (r.phone || '극장') + '로 연락해 주세요.'); code.focus(); return; }
+            if (!confirm(b.label + ' ' + b.start + ' 예약을 취소할까요?')) return;
+            btn.disabled = true; btn.textContent = '취소 중…';
+            google.script.run.withSuccessHandler(x => {
+              if (x.error) { btn.disabled = false; btn.textContent = '예약 취소하기'; setErr(msg, x.error); return; }
+              // 다시 조회하지 않고 그 자리에서 바로 바꾼다(재조회가 조회 횟수 제한에 걸려 성공이 안 보이는 일 방지)
+              const done = b.label + ' ' + b.start + ' 예약을 취소했어요.';
+              st.textContent = '취소'; st.dataset.s = '취소';
+              [lab, code, btn].forEach(x2 => x2.remove());
+              msg.className = 'okmsg'; msg.setAttribute('role', 'status'); msg.textContent = done;
+              $('lookOk').textContent = done; say(done);
+            }).withFailureHandler(e => { btn.disabled = false; btn.textContent = '예약 취소하기'; setErr(msg, friendly(e, '취소하지 못했어요.')); })
+              .cancelBooking($('lPhone').value, $('lOrg').value, b.id, code.value);
+          };
+          [lab, code, btn, msg].forEach(x => s.appendChild(x));
+          // 코드를 잊었을 때: 신청 때 적은 메일로 다시 받기(메일이 없으면 전화 안내)
+          const forgot = el('details', 'forgot');
+          forgot.appendChild(el('summary', null, '취소 코드를 잊으셨나요?'));
+          if (b.hasMail) {
+            const rb = el('button', 'btn ghost', '신청 때 적은 메일로 코드 다시 받기'); rb.type = 'button';
+            const rm = el('div', 'hint'); rm.setAttribute('role', 'status');
+            rb.onclick = () => {
+              rb.disabled = true; rb.textContent = '보내는 중…'; rm.textContent = '';
+              google.script.run.withSuccessHandler(x => {
+                rb.textContent = '신청 때 적은 메일로 코드 다시 받기';
+                if (x.error) { rb.disabled = false; setErr(rm, x.error); return; }
+                rm.textContent = x.to + '로 취소 코드를 보냈어요. 메일이 안 보이면 스팸함도 확인해 주세요.'; say(rm.textContent);
+                code.focus();
+              }).withFailureHandler(e => { rb.disabled = false; rb.textContent = '신청 때 적은 메일로 코드 다시 받기'; setErr(rm, friendly(e, '메일을 보내지 못했어요.')); })
+                .resendCode($('lPhone').value, $('lOrg').value, b.id);
+            };
+            forgot.appendChild(rb); forgot.appendChild(rm);
+          } else {
+            const p = el('p', 'hint'); setErr(p, '신청 때 이메일을 적지 않으셔서 메일로 다시 보내 드릴 수 없어요. ' + (r.phone || '극장') + '로 전화 주시면 바로 취소해 드릴게요.');
+            forgot.appendChild(p);
+          }
+          s.appendChild(forgot);
+        } else if (b.status === '대기' || b.status === '확정') {
+          const p = el('p', 'hint'); setErr(p, '관람 ' + r.cancelDays + '일 전이 지나 온라인 취소가 어려워요. ' + (r.phone || '') + '로 연락해 주세요.'); s.appendChild(p);
+        }
+        box.appendChild(s);
+      });
+    }).withFailureHandler(e => {
+      $('lookBtn').disabled = false; $('lookBtn').textContent = '예약 조회';
+      setErr($('lookErr'), friendly(e, '예약을 조회하지 못했어요.'));
+    }).lookupBooking($('lPhone').value, $('lOrg').value, $('lCode').value);
+  }
+  $('lookBtn').onclick = () => lookup();
+</script>
+</body>
+</html>
