@@ -114,6 +114,8 @@
   .btn:disabled { background:#D9D2CA; color:#5E5A55; box-shadow:none; cursor:default; filter:none; }
   .btn.ghost { background:var(--paper); color:var(--accent); border:1.5px solid var(--accent); box-shadow:none; }
   .btn.danger { background:var(--paper); color:var(--err); border:1.5px solid var(--err); box-shadow:none; }
+  .btn.kakao { background:var(--kakao); color:var(--kakao-ink); box-shadow:none; }
+  .kakao-inline { display:inline-flex; align-items:center; min-height:36px; margin-left:4px; font-weight:700; white-space:nowrap; color:var(--kakao-ink); }
 
   /* 오류: 문제가 있는 칸 바로 아래에 */
   .invalid { border-color:var(--err) !important; background:#FFFBFB; }
@@ -243,7 +245,7 @@
       <input id="lCode" autocomplete="off" maxlength="8" autocapitalize="characters" spellcheck="false" style="text-transform:uppercase" placeholder="예: K7PX2M (완료 화면·메일의 코드)">
     </div>
     <button type="button" class="btn" id="lookBtn">예약 조회</button>
-    <p class="hint">여기서는 조회와 취소만 할 수 있어요. 날짜·시간·인원을 바꾸시려면 예약을 취소하지 말고 <a class="telA" href="tel:07048006068">전화</a>로 알려 주세요. 바뀌기 전까지 기존 예약은 그대로 유지돼요.</p>
+    <p class="hint">여기서는 조회와 취소만 할 수 있어요. 날짜·시간·인원을 바꾸시려면 예약을 취소하지 말고 <a class="kakaoA" href="https://pf.kakao.com/_FVbxiX/chat" target="_blank" rel="noopener">카카오톡</a>이나 <a class="telA" href="tel:07048006068">전화</a>로 알려 주세요. 바뀌기 전까지 기존 예약은 그대로 유지돼요.</p>
     <div class="err" id="lookErr" role="alert" aria-live="assertive"></div>
     <div class="okmsg" id="lookOk" role="status"></div>
   </section>
@@ -257,6 +259,7 @@
       <div><label for="teachers">선생님</label><input id="teachers" type="number" min="0" inputmode="numeric" placeholder="예: 4"></div>
     </div>
     <p class="hint" id="minHint">아이 15명 이상, 아이가 적으면 선생님 포함 15명 이상부터 신청할 수 있어요.</p>
+    <p class="hint hide" id="feeLine" style="font-weight:700;color:var(--ink)"></p>
     <p class="hint">💳 예약금 없이 관람 당일 현장에서 결제해요. 요금은 <span id="feeLinkWrap"><a id="feeLink" target="_blank" rel="noopener">단체관람 안내 자료</a>에서 보실 수 있고, </span>확정 연락 때도 알려 드려요.</p>
   </section>
 
@@ -271,6 +274,7 @@
     </div>
     <p class="hint">상영작이 많아 확정 연락 때 함께 안내해 드려요. <span id="pdfWrap">미리 보시려면 <a id="pdf" target="_blank" rel="noopener">단체관람 안내 자료</a>를 확인해 주세요.</span></p>
     <button type="button" class="btn" id="findBtn">예약 가능한 날짜 보기</button>
+    <div class="okmsg" id="findNote" role="status"></div>
     <div class="err" id="findErr" role="alert" aria-live="assertive"></div>
   </section>
 
@@ -312,7 +316,7 @@
     <ul class="notice">
       <li>예약금 없이 관람 당일 <b>현장 결제</b>예요.</li>
       <li id="contactLi">신청 후 점장이 전화나 문자로 연락드려 영화를 안내하고 <b>확정</b>해요. 연락 전까지는 신청 상태예요.</li>
-      <li>취소는 관람 <b><span class="cdays">7</span>일 전까지</b> [예약 확인·취소]에서 할 수 있어요. 날짜·시간·인원 변경은 예약을 취소하지 말고 전화로 알려 주세요.</li>
+      <li>취소는 관람 <b><span class="cdays">7</span>일 전까지</b> [예약 확인·취소]에서 할 수 있어요. 날짜·시간·인원 변경은 예약을 취소하지 말고 카카오톡이나 전화로 알려 주세요.</li>
     </ul>
     <label class="agree"><input type="checkbox" id="agree"><span>[필수] 개인정보 수집·이용에 동의해요</span></label>
     <details class="terms"><summary>무엇을 수집하나요?</summary>
@@ -332,7 +336,7 @@
 
 <!-- 버전 33(점장 요청 + CX): 문의는 카카오톡 위주(1인 운영이라 글로 남기면 놓치지 않음). 전화는 급한 변경용으로 작게 -->
 <footer class="foot">
-  <div>영화 없이 공간·행사 대관, 기타 문의</div>
+  <div>예약 변경, 영화 없이 공간·행사 대관, 기타 문의</div>
   <a class="kakao" href="https://pf.kakao.com/_FVbxiX/chat" target="_blank" rel="noopener">💬 카카오톡으로 문의하기</a>
   <div class="foot-tel">급한 변경은 <a id="telLink" href="tel:07048006068">📞 <span id="telTxt">070-4800-6068</span></a></div>
 </footer>
@@ -356,8 +360,15 @@
   // 단계 이동은 부드럽게(움직임 줄이기 설정이면 바로), 오류는 항상 바로 그 자리로.
   const calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   // 오류 문구가 전화·연락을 안내하면 바로 걸 수 있는 링크를 붙인다(문의 버튼은 이렇게 막힐 때만 보인다).
+  const KAKAO = 'https://pf.kakao.com/_FVbxiX/chat';
+  function kakao() { return (info && info.kakao) || KAKAO; }
   function setErr(box, msg) {
     box.textContent = msg;
+    // 버전 38(CX 점검): 변경·문의는 카카오톡이 먼저. 문구에 카카오톡이 있으면 바로 여는 링크를 붙인다
+    if (msg && /카카오톡/.test(msg)) {
+      const k = document.createElement('a'); k.className = 'kakao-inline'; k.href = kakao(); k.target = '_blank'; k.rel = 'noopener'; k.textContent = '💬 카카오톡 열기';
+      box.appendChild(document.createTextNode(' ')); box.appendChild(k);
+    }
     if (msg && /전화|연락|문의/.test(msg)) {
       const a = document.createElement('a'); a.className = 'tel-inline'; a.href = 'tel:' + phone().replace(/\D/g, ''); a.textContent = '📞 전화 걸기';
       box.appendChild(document.createTextNode(' ')); box.appendChild(a);
@@ -496,6 +507,9 @@
     if (draft && draft.orgKind && [...ks.options].some(o => o.value === draft.orgKind)) ks.value = draft.orgKind;
     // 버전 32(CX 검수): 요금 안내 링크, 취소 기한, 점장이 정한 연락 시점(없으면 시점을 약속하지 않음)
     if (r.pdf) $('feeLink').href = r.pdf; else $('feeLinkWrap').classList.add('hide');
+    // 버전 38(CX 점검): 점장이 설정 탭 '요금안내'에 적은 요금 한 줄을 인원 칸 아래에 보인다(비면 숨김)
+    if (r.fee) { $('feeLine').textContent = '💰 요금: ' + r.fee; $('feeLine').classList.remove('hide'); }
+    document.querySelectorAll('.kakaoA').forEach(a => { a.href = kakao(); });
     if (r.cancelDays != null) document.querySelectorAll('.cdays').forEach(x => { x.textContent = r.cancelDays; });
     if (r.contactBy) { const li = $('contactLi'); clear(li); li.appendChild(document.createTextNode('신청 후 ')); const bb = document.createElement('b'); bb.textContent = r.contactBy + ' 안에'; li.appendChild(bb); li.appendChild(document.createTextNode(' 점장이 전화나 문자로 연락드려 영화를 안내하고 확정해요. 연락 전까지는 신청 상태예요.')); }
     document.querySelectorAll('.telA').forEach(a => { a.href = 'tel:' + String(r.phone || '070-4800-6068').replace(/\D/g, ''); });
@@ -516,7 +530,13 @@
   // 처음 정보가 올 때까지 버튼을 잠가 두고 불러오는 중임을 보여준다.
   $('movie').disabled = true; $('findBtn').disabled = true; $('findBtn').textContent = '불러오는 중…';
 
-  ['kids','teachers','movie'].forEach(id => $(id).addEventListener('change', () => { if (!submitting) resetPick(); }));
+  // 날짜를 고른 뒤 인원·영화를 바꾸면 빈 시간이 달라져 아래 단계를 접는다. 지워진 줄 오해하지 않게 이유를 알린다(버전 38, CX 점검)
+  ['kids','teachers','movie'].forEach(id => $(id).addEventListener('change', () => {
+    if (submitting) return;
+    const had = !!pick.date || !$('dateSec').classList.contains('hide');
+    resetPick();
+    if (had) { const t = '인원·영화가 바뀌어 빈 시간을 다시 찾아야 해요. 적어 두신 기관 정보는 그대로 남아 있어요. [예약 가능한 날짜 보기]를 눌러 주세요.'; $('findNote').textContent = t; say(t); }
+  }));
 
   // 신청을 보내는 동안에는 인원·영화·날짜·시간을 바꿀 수 없게 잠근다(늦게 온 검색 결과와 섞이지 않게).
   let submitting = false;
@@ -544,7 +564,7 @@
 
   $('findBtn').onclick = () => {
     if (busy) return;
-    $('findErr').textContent = '';
+    $('findErr').textContent = ''; $('findNote').textContent = '';
     if (!checkPeople()) return;
     resetPick(); busy = true; $('findBtn').disabled = true; $('findBtn').textContent = '빈 시간 찾는 중… (5초쯤 걸려요)';
     say('예약 가능한 날짜를 찾고 있어요.');
@@ -762,7 +782,7 @@
     let pend = null; try { pend = JSON.parse(sessionStorage.getItem('popo_req') || 'null'); } catch (e) {}
     if (pend && pend.id) {
       google.script.run.withSuccessHandler(c => {
-        if (c && c.found) { unlock(); finishOk(c, pend.f || {}, '조금 전에 보내신 신청이 이미 접수되어 있었어요. 내용을 바꾸시려면 기존 예약을 취소하지 말고 전화로 알려 주세요.'); return; }
+        if (c && c.found) { unlock(); finishOk(c, pend.f || {}, '조금 전에 보내신 신청이 이미 접수되어 있었어요. 내용을 바꾸시려면 기존 예약을 취소하지 말고 카카오톡이나 전화로 알려 주세요.'); return; }
         if (!c || !c.closed) {   // 아직 처리 중이거나 확인 실패 → 번호표를 지우지 않고 다시 누르게
           unlock(); lockForm(false); submitError('조금 전 신청을 아직 처리하고 있어요. 잠시 뒤 [예약 신청하기]를 다시 눌러 주세요.'); return;
         }
@@ -791,7 +811,7 @@
     [['날짜', r.label + ' ' + r.start + ' 시작'], ['인원', '아이 ' + kidsN + '명 · 선생님 ' + teachersN + '명'], ['영화', mv],
      ['기관', r.org || f.org], ['예약번호', r.id]].concat(r.snack ? [['매점', r.snack + ' · 당일 현장 결제']] : []).forEach(([k, v]) => { const row = el('div'); row.appendChild(el('dt', null, k)); row.appendChild(el('dd', null, v)); dl.appendChild(row); });
     const next = el('p', 'next', '아직 확정 전이에요. ' + (info && info.contactBy ? info.contactBy + ' 안에 ' : '') +
-      '점장이 전화나 문자로 연락드려 영화를 안내하고 확정해 드려요. 예약금 없이 관람 당일 현장에서 결제해 주세요. 날짜·시간·인원을 바꾸실 땐 예약을 취소하지 말고 전화 주세요.');
+      '점장이 전화나 문자로 연락드려 영화를 안내하고 확정해 드려요. 예약금 없이 관람 당일 현장에서 결제해 주세요. 날짜·시간·인원을 바꾸실 땐 예약을 취소하지 말고 카카오톡이나 전화로 알려 주세요.');
 
     const box = el('div', 'codebox');
     box.appendChild(el('div', 't', '온라인 취소 코드'));
@@ -808,13 +828,17 @@
     const mail = el('p', 'hint', r.mail === 'sent' ? f.email + '로 예약번호와 취소 코드를 담은 안내 메일을 보냈어요.'
       : r.mail === 'fail' ? '안내 메일은 보내지 못했어요. 신청은 정상 접수됐으니 이 화면을 캡처해 두세요.' : '');
 
-    const tel = el('a', 'btn', '📞 ' + phone() + ' 전화하기'); tel.href = 'tel:' + phone().replace(/\D/g, '');
+    // 버전 38(CX 점검): 문의·변경은 카카오톡이 먼저(글로 남아 놓치지 않음). 전화는 급할 때용으로 작게
+    const kk = el('a', 'btn kakao', '💬 카카오톡으로 문의·변경하기'); kk.href = kakao(); kk.target = '_blank'; kk.rel = 'noopener';
     const look = el('button', 'linkbtn', '예약 확인·취소 화면으로'); look.type = 'button'; look.onclick = () => showTab(true);
     const home = el('a', 'btn ghost', '포포시네마 홈으로'); home.href = HOME;
+    const telP = el('p', 'hint'); telP.appendChild(document.createTextNode('급한 변경은 '));
+    const tel = el('a', 'tel-inline', '📞 ' + phone()); tel.href = 'tel:' + phone().replace(/\D/g, ''); telP.appendChild(tel);
     const lookP = el('p', 'hint'); lookP.appendChild(look);
 
-    [em, h, lead, dl, next, box, mail, tel, home, lookP].forEach(x => { if (x !== mail || mail.textContent) s.appendChild(x); });
+    [em, h, lead, dl, next, box, mail, kk, home, telP, lookP].forEach(x => { if (x !== mail || mail.textContent) s.appendChild(x); });
     app.appendChild(s);
+    syncFoot();
     // 화면 읽기·키보드 사용자도 완료 화면 처음부터 듣게 제목으로 초점을 옮긴다(버전 32, CX 검수)
     h.tabIndex = -1; try { h.focus({ preventScroll:true }); } catch (e) {}
   }
@@ -823,8 +847,11 @@
   function showTab(look) {
     $('look').classList.toggle('hide', !look); $('app').classList.toggle('hide', look);
     $('tabLook').setAttribute('aria-selected', look ? 'true' : 'false'); $('tabBook').setAttribute('aria-selected', look ? 'false' : 'true');
+    syncFoot();
     window.scrollTo(0, 0);
   }
+  // 완료 화면에는 카카오톡·전화 버튼이 이미 있어 바닥 문의 줄을 숨긴다(같은 버튼이 두 번 보이지 않게, 버전 38)
+  function syncFoot() { const ft = document.querySelector('.foot'); if (ft) ft.classList.toggle('hide', !$('app').classList.contains('hide') && !!$('app').querySelector('.done')); }
   $('tabBook').onclick = () => showTab(false);
   $('tabLook').onclick = () => showTab(true);
 
