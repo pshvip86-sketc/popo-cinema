@@ -209,6 +209,10 @@
   .tel-inline { display:inline-flex; align-items:center; min-height:36px; margin-left:4px; font-weight:700; white-space:nowrap; }
   .foot { max-width:560px; margin:8px auto 0; padding:8px 16px 28px; text-align:center; font-size:13px; color:var(--muted); }
   .foot a { display:inline-flex; align-items:center; min-height:40px; padding:0 6px; color:var(--body); font-weight:700; }
+  .foot a.kakao { justify-content:center; min-height:48px; margin:8px 0 6px; padding:10px 22px; border-radius:999px; background:var(--kakao); color:var(--kakao-ink); font-size:15px; text-decoration:none; }
+  .foot a.kakao:hover { filter:brightness(.97); }
+  .foot .foot-tel { font-size:12px; }
+  .foot .foot-tel a { min-height:36px; font-weight:500; color:var(--muted); }
 </style>
 </head>
 <body>
@@ -326,10 +330,11 @@
   </section>
 </main>
 
+<!-- 버전 33(점장 요청 + CX): 문의는 카카오톡 위주(1인 운영이라 글로 남기면 놓치지 않음). 전화는 급한 변경용으로 작게 -->
 <footer class="foot">
-  영화 없이 공간·행사 대관, 기타 문의는
-  <a id="telLink" href="tel:07048006068">📞 <span id="telTxt">070-4800-6068</span></a>
-  <a href="https://pf.kakao.com/_FVbxiX/chat" target="_blank" rel="noopener">💬 카카오톡</a>
+  <div>영화 없이 공간·행사 대관, 기타 문의</div>
+  <a class="kakao" href="https://pf.kakao.com/_FVbxiX/chat" target="_blank" rel="noopener">💬 카카오톡으로 문의하기</a>
+  <div class="foot-tel">급한 변경은 <a id="telLink" href="tel:07048006068">📞 <span id="telTxt">070-4800-6068</span></a></div>
 </footer>
 
 <script>
