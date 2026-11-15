@@ -88,6 +88,8 @@
   .logo { display:block; height:30px; width:auto; margin:4px 0 8px; }
   .hero h1 { margin:0; font-size:23px; font-weight:700; letter-spacing:-0.01em; }
   .hero p { margin:4px 0 0; font-size:14px; font-weight:500; }
+  .steps { list-style:none; display:flex; flex-wrap:wrap; gap:4px 10px; margin:8px 0 0; padding:0; font-size:13px; font-weight:700; }
+  .steps li + li::before { content:'→ '; font-weight:400; }
   .tabs { display:flex; gap:6px; margin-top:14px; padding:4px; background:rgba(255,255,255,.45); border-radius:999px; }
   .tab { flex:1; min-height:44px; padding:8px 10px; border:0; border-radius:999px; background:transparent; color:var(--hero-ink); font-size:15px; font-weight:700; cursor:pointer; }
   .tab[aria-selected="true"] { background:var(--paper); color:var(--accent); box-shadow:0 2px 8px rgba(150,90,40,.15); }
@@ -216,6 +218,7 @@
     <img class="logo" src="https://popo-cinema.vercel.app/logo-line.png" width="207" height="30" alt="포포시네마">
     <h1>단체관람 예약</h1>
     <p>날짜와 시간을 직접 골라 신청하시면, 점장이 연락드려 영화를 안내하고 확정해 드려요.</p>
+    <ol class="steps" aria-label="진행 순서"><li>① 온라인 신청</li><li>② 점장 연락·확정</li><li>③ 당일 현장 결제</li></ol>
     <div class="tabs" role="tablist" aria-label="예약 메뉴">
       <button type="button" class="tab" id="tabBook" role="tab" aria-selected="true" aria-controls="app">예약 신청</button>
       <button type="button" class="tab" id="tabLook" role="tab" aria-selected="false" aria-controls="look">예약 확인·취소</button>
@@ -229,13 +232,14 @@
     <h2><span class="ic" aria-hidden="true">🔎</span>예약 확인·취소</h2>
     <label for="lPhone">연락처</label><input id="lPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="신청할 때 입력한 번호">
     <label for="lOrg">기관명</label><input id="lOrg" autocomplete="organization" placeholder="신청할 때 입력한 기관명">
-    <p class="hint">띄어쓰기·괄호는 달라도 괜찮아요. 기관명 전체가 기억나지 않으면 앞부분과 취소 코드를 같이 넣어 주세요.</p>
-    <!-- 조회가 여러 번 실패해 막혔을 때만 보인다: 취소 코드가 있으면 바로 조회 -->
-    <div id="lCodeWrap" class="hide">
-      <label for="lCode">취소 코드 (영어·숫자 6자리)</label>
+    <p class="hint">띄어쓰기·괄호는 달라도 괜찮아요. 기관명 전체가 기억나지 않으면 앞부분과 아래 취소 코드를 같이 넣어 주세요.</p>
+    <!-- 버전 32(CX 검수): 처음부터 보이는 선택 칸. 기관명 앞부분만 기억나거나 조회가 막혔을 때 쓴다 -->
+    <div id="lCodeWrap">
+      <label for="lCode">취소 코드 <span style="font-weight:400;color:var(--muted)">(선택 · 영어·숫자 6자리)</span></label>
       <input id="lCode" autocomplete="off" maxlength="8" autocapitalize="characters" spellcheck="false" style="text-transform:uppercase" placeholder="예: K7PX2M (완료 화면·메일의 코드)">
     </div>
     <button type="button" class="btn" id="lookBtn">예약 조회</button>
+    <p class="hint">여기서는 조회와 취소만 할 수 있어요. 날짜·시간·인원을 바꾸시려면 예약을 취소하지 말고 <a class="telA" href="tel:07048006068">전화</a>로 알려 주세요. 바뀌기 전까지 기존 예약은 그대로 유지돼요.</p>
     <div class="err" id="lookErr" role="alert" aria-live="assertive"></div>
     <div class="okmsg" id="lookOk" role="status"></div>
   </section>
@@ -249,6 +253,7 @@
       <div><label for="teachers">선생님</label><input id="teachers" type="number" min="0" inputmode="numeric" placeholder="예: 4"></div>
     </div>
     <p class="hint" id="minHint">아이 15명 이상, 아이가 적으면 선생님 포함 15명 이상부터 신청할 수 있어요.</p>
+    <p class="hint">💳 예약금 없이 관람 당일 현장에서 결제해요. 요금은 <span id="feeLinkWrap"><a id="feeLink" target="_blank" rel="noopener">단체관람 안내 자료</a>에서 보실 수 있고, </span>확정 연락 때도 알려 드려요.</p>
   </section>
 
   <section>
@@ -301,9 +306,9 @@
     </div>
 
     <ul class="notice">
-      <li>결제는 관람 당일 <b>현장 결제</b>예요.</li>
-      <li>신청 후 점장이 연락드려 영화를 안내하고 <b>확정</b>해요. 연락 전까지는 신청 상태예요.</li>
-      <li>취소·변경은 관람 <b>7일 전까지</b> 연락 부탁드려요.</li>
+      <li>예약금 없이 관람 당일 <b>현장 결제</b>예요.</li>
+      <li id="contactLi">신청 후 점장이 전화나 문자로 연락드려 영화를 안내하고 <b>확정</b>해요. 연락 전까지는 신청 상태예요.</li>
+      <li>취소는 관람 <b><span class="cdays">7</span>일 전까지</b> [예약 확인·취소]에서 할 수 있어요. 날짜·시간·인원 변경은 예약을 취소하지 말고 전화로 알려 주세요.</li>
     </ul>
     <label class="agree"><input type="checkbox" id="agree"><span>[필수] 개인정보 수집·이용에 동의해요</span></label>
     <details class="terms"><summary>무엇을 수집하나요?</summary>
@@ -322,7 +327,7 @@
 </main>
 
 <footer class="foot">
-  대관·기타 문의
+  영화 없이 공간·행사 대관, 기타 문의는
   <a id="telLink" href="tel:07048006068">📞 <span id="telTxt">070-4800-6068</span></a>
   <a href="https://pf.kakao.com/_FVbxiX/chat" target="_blank" rel="noopener">💬 카카오톡</a>
 </footer>
@@ -409,7 +414,7 @@
   function snackRefresh() {
     const v = snackVals();
     const total = snackList.reduce((t, s) => t + (v[s.name] || 0) * s.price, 0);
-    $('snackTot').textContent = total ? '매점 합계 ' + won(total) + ' · 당일 현장 결제' : '';
+    $('snackTot').textContent = total ? '매점 합계 ' + won(total) + ' (티켓 요금과 별도) · 당일 현장 결제' : '';
     updateSummary();
   }
   function renderSnacks(list, saved) {
@@ -484,6 +489,11 @@
     if (r.orgKinds && r.orgKinds.length) r.orgKinds.forEach(k => { const o = document.createElement('option'); o.value = k; o.textContent = k; ks.appendChild(o); });
     else { ks.classList.add('hide'); const lb = document.querySelector('label[for="orgKind"]'); if (lb) lb.classList.add('hide'); }
     if (draft && draft.orgKind && [...ks.options].some(o => o.value === draft.orgKind)) ks.value = draft.orgKind;
+    // 버전 32(CX 검수): 요금 안내 링크, 취소 기한, 점장이 정한 연락 시점(없으면 시점을 약속하지 않음)
+    if (r.pdf) $('feeLink').href = r.pdf; else $('feeLinkWrap').classList.add('hide');
+    if (r.cancelDays != null) document.querySelectorAll('.cdays').forEach(x => { x.textContent = r.cancelDays; });
+    if (r.contactBy) { const li = $('contactLi'); clear(li); li.appendChild(document.createTextNode('신청 후 ')); const bb = document.createElement('b'); bb.textContent = r.contactBy + ' 안에'; li.appendChild(bb); li.appendChild(document.createTextNode(' 점장이 전화나 문자로 연락드려 영화를 안내하고 확정해요. 연락 전까지는 신청 상태예요.')); }
+    document.querySelectorAll('.telA').forEach(a => { a.href = 'tel:' + String(r.phone || '070-4800-6068').replace(/\D/g, ''); });
     if (r.pdf) $('pdf').href = r.pdf; else { $('pdf').removeAttribute('href'); $('pdfWrap').classList.add('hide'); }
     if (r.phone) { $('telLink').href = 'tel:' + r.phone.replace(/\D/g, ''); $('telTxt').textContent = r.phone; }
     $('minHint').textContent = '아이 ' + r.minPeople + '명 이상, 아이가 적으면 선생님 포함 ' + r.minPeople +
@@ -548,7 +558,7 @@
     }).getAvailability($('kids').value, $('teachers').value, $('movie').value);
   };
 
-  let calDays = {}, calMonths = [], calIdx = 0;
+  let calDays = {}, calMonths = [], calIdx = 0, calWindow = null;
 
   function renderDays(days) {
     $('dateSec').classList.remove('hide');
@@ -559,7 +569,20 @@
       nd.appendChild(a); nd.appendChild(document.createTextNode('로 문의해 주세요.'));
     }
     calDays = {}; calMonths = [];
-    days.forEach(d => { calDays[d.date] = d; const m = d.date.slice(0, 7); if (calMonths.indexOf(m) < 0) calMonths.push(m); });
+    days.forEach(d => { calDays[d.date] = d; });
+    // 빈 달을 건너뛰지 않는다(버전 32, CX 검수): 첫 신청 가능 달부터 마지막 달까지 모두 보여 주고, 빈 달은 그렇다고 알린다
+    // Codex v32: 신청 가능한 날이 있는 첫·마지막 달 사이만이 아니라 조회 기간 전체(오늘+신청기한 ~ 오늘+예약가능기간)를 보여 준다
+    const keys = Object.keys(calDays).sort();
+    if (keys.length) {
+      const kst = new Date(Date.now() + 9 * 3600000), plus = n => new Date(Date.UTC(kst.getUTCFullYear(), kst.getUTCMonth(), kst.getUTCDate() + n)).toISOString().slice(0, 10);
+      const winFrom = info && info.deadline != null ? plus(info.deadline) : keys[0];
+      const winTo = info && info.horizon ? plus(info.horizon) : keys[keys.length - 1];
+      const from = winFrom < keys[0] ? winFrom : keys[0], to = winTo > keys[keys.length - 1] ? winTo : keys[keys.length - 1];
+      calWindow = [winFrom, winTo];
+      let y = Number(from.slice(0, 4)), m = Number(from.slice(5, 7));
+      const last = to.slice(0, 7);
+      for (let i = 0; i < 24; i++) { const ym = y + '-' + String(m).padStart(2, '0'); calMonths.push(ym); if (ym >= last) break; m++; if (m > 12) { m = 1; y++; } }
+    }
     calIdx = 0;
     renderMonth();
   }
@@ -590,9 +613,9 @@
     grid.style.gridTemplateColumns = 'repeat(' + cols.length + ', minmax(0, 1fr))';
     cols.forEach(w => { const e = document.createElement('div'); e.className = 'wd'; e.textContent = '일월화수목금토'[w]; grid.appendChild(e); });
     // 첫 달은 신청 가능한 첫날이 들어 있는 주부터 보여준다(지난 주는 숨김).
-    const firstKey = Object.keys(calDays).sort()[0];
+    const allKeys = Object.keys(calDays).sort(), firstKey = allKeys[0], lastKey = allKeys[allKeys.length - 1];
     let startDay = 1;
-    if (calIdx === 0 && firstKey.slice(0, 7) === ym) {
+    if (calIdx === 0 && firstKey && firstKey.slice(0, 7) === ym) {
       const fd = Number(firstKey.slice(8, 10));
       startDay = Math.max(1, fd - dowOf(fd));
     }
@@ -613,7 +636,9 @@
     box.appendChild(grid);
     const cnt = Object.keys(calDays).filter(k => k.slice(0, 7) === ym).length;
     const lg = document.createElement('div'); lg.className = 'cal-legend';
-    lg.textContent = '이달 신청 가능 ' + cnt + '일 · 주황 테두리 날짜만 신청할 수 있어요. 주말·공휴일·휴무일은 빠져 있어요.';
+    const md = k => Number(k.slice(5, 7)) + '/' + Number(k.slice(8, 10));
+    lg.textContent = (cnt ? '이달 신청 가능 ' + cnt + '일 · 주황 테두리 날짜만 신청할 수 있어요.' : '이달은 신청 가능한 날이 없어요(예약이 찼거나 휴무).' + (calIdx < calMonths.length - 1 ? ' ›로 다음 달을 확인해 주세요.' : ' ‹로 앞 달을 확인해 주세요.')) +
+      ' 주말·공휴일·휴무일은 빠져 있어요. 신청 받는 기간: ' + md(calWindow ? calWindow[0] : firstKey) + ' ~ ' + md(calWindow ? calWindow[1] : lastKey) + '.';
     box.appendChild(lg);
   }
 
@@ -676,7 +701,7 @@
     if (busy) return;
     $('submitErr').textContent = '';
     const f = { kids:$('kids').value, teachers:$('teachers').value, movie:$('movie').value, date:pick.date, start:pick.start,
-      org:$('org').value, name:$('name').value, phone:$('phone').value, email:$('email').value.trim(), glow:$('glow').value, note:$('note').value, agree:$('agree').checked, snack:snackVals(),
+      org:$('org').value, name:$('name').value, phone:$('phone').value, email:$('email').value.trim(), glow:$('glow').value, note:$('note').value, agree:$('agree').checked, snack:snackVals(), snackPrices:snackList.reduce((o, s) => { o[s.name] = s.price; return o; }, {}),
       orgKind:$('orgKind').value, movieCustom: isCustom() ? $('movieCustom').value.trim() : '' };
     if (!f.date || !f.start) { submitError('날짜와 시간을 선택해 주세요.'); return; }
     if (isCustom() && !f.movieCustom) { fieldErr('movieCustom', '보고 싶은 영화 이름을 적어 주세요. 모르시면 영화에서 [상담 후 결정]을 골라 주세요.'); return; }
@@ -732,7 +757,7 @@
     let pend = null; try { pend = JSON.parse(sessionStorage.getItem('popo_req') || 'null'); } catch (e) {}
     if (pend && pend.id) {
       google.script.run.withSuccessHandler(c => {
-        if (c && c.found) { unlock(); finishOk(c, pend.f || {}, '조금 전에 보내신 신청이 이미 접수되어 있었어요. 내용을 바꾸시려면 [예약 확인·취소]에서 취소한 뒤 다시 신청해 주세요.'); return; }
+        if (c && c.found) { unlock(); finishOk(c, pend.f || {}, '조금 전에 보내신 신청이 이미 접수되어 있었어요. 내용을 바꾸시려면 기존 예약을 취소하지 말고 전화로 알려 주세요.'); return; }
         if (!c || !c.closed) {   // 아직 처리 중이거나 확인 실패 → 번호표를 지우지 않고 다시 누르게
           unlock(); lockForm(false); submitError('조금 전 신청을 아직 처리하고 있어요. 잠시 뒤 [예약 신청하기]를 다시 눌러 주세요.'); return;
         }
@@ -760,7 +785,8 @@
     const kidsN = r.kids != null ? r.kids : f.kids, teachersN = r.teachers != null ? r.teachers : f.teachers;   // 서버가 저장한 값
     [['날짜', r.label + ' ' + r.start + ' 시작'], ['인원', '아이 ' + kidsN + '명 · 선생님 ' + teachersN + '명'], ['영화', mv],
      ['기관', r.org || f.org], ['예약번호', r.id]].concat(r.snack ? [['매점', r.snack + ' · 당일 현장 결제']] : []).forEach(([k, v]) => { const row = el('div'); row.appendChild(el('dt', null, k)); row.appendChild(el('dd', null, v)); dl.appendChild(row); });
-    const next = el('p', 'next', '점장이 연락드려 영화를 안내하고 확정해 드려요. 결제는 관람 당일 현장에서 해 주세요.');
+    const next = el('p', 'next', '아직 확정 전이에요. ' + (info && info.contactBy ? info.contactBy + ' 안에 ' : '') +
+      '점장이 전화나 문자로 연락드려 영화를 안내하고 확정해 드려요. 예약금 없이 관람 당일 현장에서 결제해 주세요. 날짜·시간·인원을 바꾸실 땐 예약을 취소하지 말고 전화 주세요.');
 
     const box = el('div', 'codebox');
     box.appendChild(el('div', 't', '온라인 취소 코드'));
@@ -784,6 +810,8 @@
 
     [em, h, lead, dl, next, box, mail, tel, home, lookP].forEach(x => { if (x !== mail || mail.textContent) s.appendChild(x); });
     app.appendChild(s);
+    // 화면 읽기·키보드 사용자도 완료 화면 처음부터 듣게 제목으로 초점을 옮긴다(버전 32, CX 검수)
+    h.tabIndex = -1; try { h.focus({ preventScroll:true }); } catch (e) {}
   }
 
   /* ---- 예약 확인·취소 ---- */
@@ -817,6 +845,7 @@
         s.appendChild(st);
         [b.label + ' ' + b.start, '영화: ' + b.movie + (b.wish ? ' (희망: ' + b.wish + ')' : ''),'아이 ' + b.kids + '명 · 선생님 ' + b.teachers + '명'].concat(b.snack ? ['매점: ' + b.snack] : []).concat(['예약번호 ' + b.id])
           .forEach(t => s.appendChild(el('div', 'line', t)));
+        if (b.status === '대기') s.appendChild(el('p', 'hint', '아직 확정 전이에요. ' + (info && info.contactBy ? info.contactBy + ' 안에 ' : '') + '점장이 전화나 문자로 연락드려요.'));
         if (b.canCancel) {
           const lab = el('label', null, '취소 코드 (영어·숫자 6자리)');
           const code = document.createElement('input'); code.autocomplete = 'off'; code.maxLength = 8; code.setAttribute('autocapitalize', 'characters'); code.spellcheck = false; // 코드는 영어 대문자+숫자라 숫자 자판을 띄우지 않는다
