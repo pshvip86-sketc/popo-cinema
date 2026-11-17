@@ -219,7 +219,7 @@
     <div>
       <span class="today-label" id="today-label">운영시간</span>
       <span class="today-hours" id="today-hours">10:00 ~ 18:00</span>
-      <span class="today-sub" id="today-sub">매주 월·화 휴관</span>
+      <span class="today-sub" id="today-sub">매주 월·화, 둘째·넷째 수 휴관</span>
     </div>
     <span class="today-pill" id="today-pill" hidden></span>
   </section>
@@ -469,7 +469,7 @@
       </div>
       <div class="info-row">
         <span class="info-label">운영</span>
-        <span class="info-value">수 ~ 일 10:00 ~ 18:00<br>매주 월·화 휴관</span>
+        <span class="info-value">수 ~ 일 10:00 ~ 18:00<br>매주 월·화 휴관<br>매달 둘째·넷째 수요일 휴관 (홈플러스 정기휴무)</span>
       </div>
     </div>
     <a href="https://map.naver.com/v5/search/%ED%99%88%ED%94%8C%EB%9F%AC%EC%8A%A4%20%EA%B9%80%ED%8F%AC%ED%92%8D%EB%AC%B4%EC%A0%90" class="schedule-btn map" target="_blank" rel="noopener noreferrer">
@@ -488,7 +488,7 @@
     <img class="footer-logo" src="logo-mascot.png" width="448" height="334" loading="lazy" decoding="async" alt="포포시네마 마스코트">
     <div class="footer-name">포포시네마 김포풍무점</div>
     경기 김포시 풍무로 167 홈플러스 지하 1층<br>
-    Tel. 070-4800-6068 · 운영 수~일 10:00~18:00 (월·화 휴관)<br><br>
+    Tel. 070-4800-6068 · 운영 수~일 10:00~18:00 (월·화, 둘째·넷째 수 휴관)<br><br>
     <a href="https://www.monoplex.kr/space/oxxN6Ykd3WXh-OXVTBuUFA" target="_blank" rel="noopener noreferrer">모노플렉스 공식 페이지 →</a>
   </div>
 
@@ -512,6 +512,8 @@
       cacheMinutes: 5,      // 시트를 다시 읽기 전 기다리는 시간 (구글 자체 반영 지연도 약 5분)
       hours: { open: '10:00', close: '18:00' }, // 운영시간 (운영 카드와 '영업 중' 표시에 사용)
       weeklyClosedDays: [1, 2], // 정기 휴관 요일 (0=일 1=월 2=화 3=수 4=목 5=금 6=토) → 월·화
+      monthlyClosedWednesdays: [2, 4], // 매달 몇째 수요일 휴관인지 (홈플러스 정기휴무 → 둘째·넷째 수요일)
+      monthlyClosedReason: '홈플러스 정기휴무',
       upcomingClosedDays: 14, // 오늘부터 며칠 앞까지 휴관 예고를 보여줄지
       // 한 번만 적용하는 예외 (정기 휴관 요일 규칙은 그대로 두고 그 날짜만 바꿔요)
       extraOpenDates: ['2026-11-17'],   // 정기 휴관 요일이지만 영업하는 날
@@ -636,6 +638,12 @@
       return CONFIG.weeklyClosedDays.includes(weekdayOf(dateStr)) && !CONFIG.extraOpenDates.includes(dateStr);
     }
 
+    // 홈플러스 정기휴무(매달 둘째·넷째 수요일)인지. extraOpenDates에 적힌 날은 예외로 영업
+    function isMonthlyClosed(dateStr) {
+      const nth = Math.ceil(Number(dateStr.slice(8, 10)) / 7);
+      return weekdayOf(dateStr) === 3 && CONFIG.monthlyClosedWednesdays.includes(nth) && !CONFIG.extraOpenDates.includes(dateStr);
+    }
+
     function setPill(pill, kind, text) {
       pill.className = 'today-pill ' + kind;
       pill.textContent = text;
@@ -655,10 +663,13 @@
       const closed = closedRows
         .map(r => ({ date: normDate(r['날짜']), reason: r['사유'] || '' }))
         .concat(CONFIG.extraClosedDates.map(r => ({ date: normDate(r.date), reason: r.reason || '' })))
+        .concat(Array.from({ length: 31 }, (_, i) => addDays(now.date, i))
+          .filter(isMonthlyClosed)
+          .map(d => ({ date: d, reason: CONFIG.monthlyClosedReason })))
         .filter(r => r.date)
         .sort((a, b) => a.date.localeCompare(b.date));
       const closedDates = new Set(closed.map(r => r.date));
-      const weeklyText = '매주 ' + CONFIG.weeklyClosedDays.map(d => '일월화수목금토'[d]).join('·') + ' 휴관';
+      const weeklyText = '매주 ' + CONFIG.weeklyClosedDays.map(d => '일월화수목금토'[d]).join('·') + ', 둘째·넷째 수 휴관';
 
       const todays = closed.find(r => r.date === now.date);
       if (todays || weeklyClosed) {
