@@ -512,7 +512,12 @@
       cacheMinutes: 5,      // 시트를 다시 읽기 전 기다리는 시간 (구글 자체 반영 지연도 약 5분)
       hours: { open: '10:00', close: '18:00' }, // 운영시간 (운영 카드와 '영업 중' 표시에 사용)
       weeklyClosedDays: [1, 2], // 정기 휴관 요일 (0=일 1=월 2=화 3=수 4=목 5=금 6=토) → 월·화
-      upcomingClosedDays: 14 // 오늘부터 며칠 앞까지 휴관 예고를 보여줄지
+      upcomingClosedDays: 14, // 오늘부터 며칠 앞까지 휴관 예고를 보여줄지
+      // 한 번만 적용하는 예외 (정기 휴관 요일 규칙은 그대로 두고 그 날짜만 바꿔요)
+      extraOpenDates: ['2026-11-17'],   // 정기 휴관 요일이지만 영업하는 날
+      extraClosedDates: [               // 정기 휴관 요일이 아니지만 휴관하는 날
+        { date: '2026-11-18', reason: '이번 주는 수요일 휴관' }
+      ]
     };
 
     /* ───────────── 날짜·시간 도구 (항상 한국시간 기준) ───────────── */
@@ -626,6 +631,11 @@
       return `${t.getUTCFullYear()}-${pad(t.getUTCMonth() + 1)}-${pad(t.getUTCDate())}`;
     }
 
+    // 정기 휴관 요일인지 (extraOpenDates에 적힌 날은 예외로 영업)
+    function isWeeklyClosed(dateStr) {
+      return CONFIG.weeklyClosedDays.includes(weekdayOf(dateStr)) && !CONFIG.extraOpenDates.includes(dateStr);
+    }
+
     function setPill(pill, kind, text) {
       pill.className = 'today-pill ' + kind;
       pill.textContent = text;
@@ -644,6 +654,7 @@
 
       const closed = closedRows
         .map(r => ({ date: normDate(r['날짜']), reason: r['사유'] || '' }))
+        .concat(CONFIG.extraClosedDates.map(r => ({ date: normDate(r.date), reason: r.reason || '' })))
         .filter(r => r.date)
         .sort((a, b) => a.date.localeCompare(b.date));
       const closedDates = new Set(closed.map(r => r.date));
@@ -654,7 +665,7 @@
         let next = '';
         for (let i = 1; i <= 21 && !next; i++) {
           const d = addDays(now.date, i);
-          if (!CONFIG.weeklyClosedDays.includes(weekdayOf(d)) && !closedDates.has(d)) next = d;
+          if (!isWeeklyClosed(d) && !closedDates.has(d)) next = d;
         }
         const reason = todays ? todays.reason : weeklyText;
         card.classList.add('is-closed');
@@ -708,7 +719,7 @@
 
     async function initSheet() {
       const now = nowKST();
-      const weeklyClosedToday = CONFIG.weeklyClosedDays.includes(weekdayOf(now.date));
+      const weeklyClosedToday = isWeeklyClosed(now.date);
       // 시트 주소가 비어 있어도 정기 휴관 요일 안내는 동작해요 (loadSheet가 null을 돌려줌)
       const [schedule, closed] = await Promise.all([loadSheet(CONFIG.scheduleCsvUrl), loadSheet(CONFIG.closedCsvUrl)]);
       const shows = schedule ? todaysShows(schedule, now) : [];
