@@ -498,7 +498,9 @@
     const o0 = document.createElement('option'); o0.value = r.undecided; o0.textContent = '상담 후 결정 (추천)'; sel.appendChild(o0);
     r.movies.forEach(m => {
       const o = document.createElement('option'); o.value = m.name;
-      o.textContent = m.name + (m.runtime ? ' · ' + m.runtime + '분' : ''); sel.appendChild(o);
+      // 개봉 전 영화는 개봉일을 붙인다(버전 50). 날짜 목록도 개봉일부터만 나온다
+      const rel = m.release ? String(m.release).split('-') : null;
+      o.textContent = m.name + (m.runtime ? ' · ' + m.runtime + '분' : '') + (rel ? ' · ' + (+rel[1]) + '/' + (+rel[2]) + ' 개봉' : ''); sel.appendChild(o);
     });
     if (r.movieCustom) { const oc = document.createElement('option'); oc.value = r.movieCustom; oc.textContent = '목록에 없는 영화 (직접 입력)'; sel.appendChild(oc); }
     const ks = $('orgKind');
