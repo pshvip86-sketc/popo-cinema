@@ -166,6 +166,8 @@
   .stepper button { width:44px; height:44px; border:1.5px solid var(--line-strong); border-radius:12px; background:var(--paper); font-size:20px; line-height:1; cursor:pointer; }
   .stepper input { width:64px; min-height:44px; padding:6px 4px; text-align:center; font-variant-numeric:tabular-nums; }
   .snack .tot { margin-top:8px; font-weight:700; font-size:15px; text-align:right; font-variant-numeric:tabular-nums; }
+  .snack .dup { margin-top:8px; padding:10px 12px; background:var(--accent-soft); border-radius:12px; font-size:14px; word-break:keep-all; }
+  .snack .dup:empty { display:none; }
   .notice { margin:16px 0 0; padding:12px 14px 12px 32px; background:var(--accent-soft); border-radius:var(--radius-sm); }
   .notice li { font-size:14px; margin:3px 0; color:var(--body); }
   .agree { display:flex; gap:10px; align-items:center; min-height:52px; margin:14px 0 0; padding:10px 14px; border:1.5px solid var(--line-strong); border-radius:var(--radius-sm); font-size:15px; cursor:pointer; }
@@ -310,6 +312,7 @@
       <div class="sh" id="snackHead">🍿 매점 단체 세트 미리 주문 <span class="sub">(선택)</span></div>
       <div id="snackList"></div>
       <div class="tot" id="snackTot" aria-live="polite"></div>
+      <div class="dup" id="snackDup" aria-live="polite"></div>
       <p class="hint">미리 알려 주시면 관람 전에 준비해 둘게요. 매점은 관람 당일 현장에서 따로 결제하고, 수량은 당일 바꿔도 괜찮아요.</p>
     </div>
 
@@ -431,7 +434,16 @@
     const v = snackVals();
     const total = snackList.reduce((t, s) => t + (v[s.name] || 0) * s.price, 0);
     $('snackTot').textContent = total ? '매점 합계 ' + won(total) + ' (티켓 요금과 별도) · 당일 현장 결제' : '';
+    // 버전 59(11/20 점장): 세트(미니팝콘+팩음료)와 그 안에 든 상품(미니팝콘)을 둘 다 고르면 막지 않고 한 번 확인
+    $('snackDup').textContent = snackDup(v).map(d => '⚠ ' + d[1] + ' 세트에 ' + d[0] + '이 이미 들어 있어요. ' + d[0] + '만 따로 더 필요하신 게 맞나요? 아니면 ' + d[0] + ' 수량을 0으로 해 주세요.').join('\n');
     updateSummary();
+  }
+  /** 세트 안에 든 상품 [[든 상품, 세트]] — 세트 이름이 '상품+…'로 시작하면 그 상품이 들어 있다고 본다 */
+  function snackParts(s) { return snackList.filter(p => p.name !== s.name && s.name.indexOf(p.name + '+') === 0).map(p => p.name); }
+  function snackDup(v) {
+    const out = [];
+    snackList.forEach(s => { if (v[s.name]) snackParts(s).forEach(p => { if (v[p]) out.push([p, s.name]); }); });
+    return out;
   }
   function renderSnacks(list, saved) {
     snackList = (list || []).filter(s => s && s.name);
@@ -440,7 +452,7 @@
     snackList.forEach((s, i) => {
       const row = document.createElement('div'); row.className = 'it';
       const nm = document.createElement('label'); nm.className = 'nm'; nm.htmlFor = 'snq' + i; nm.textContent = s.name;
-      const pr = document.createElement('span'); pr.className = 'pr'; pr.textContent = '1개 ' + won(s.price); nm.appendChild(pr);
+      const pr = document.createElement('span'); pr.className = 'pr'; pr.textContent = '1개 ' + won(s.price) + (snackParts(s).length ? ' · 세트 (' + snackParts(s).join('·') + ' 포함)' : ''); nm.appendChild(pr);
       const st = document.createElement('div'); st.className = 'stepper';
       const inp = document.createElement('input'); inp.id = 'snq' + i; inp.type = 'number'; inp.min = '0'; inp.max = '300'; inp.inputMode = 'numeric'; inp.value = '0';
       if (saved && saved[s.name] > 0) inp.value = String(Math.min(300, saved[s.name]));
