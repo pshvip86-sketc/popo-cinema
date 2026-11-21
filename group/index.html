@@ -211,6 +211,8 @@
 
   /* 문의: 첫 화면에 띄우지 않는다(11/14 점장). 막힐 때만 전화 링크, 맨 아래에 작은 줄. */
   .tel-inline { display:inline-flex; align-items:center; min-height:44px; margin-left:4px; font-weight:700; white-space:nowrap; }
+  /* 버전 61(11/21 Codex 2차 N9): 조회 안내 문장 속 카카오톡·전화 링크도 누름 높이 44px */
+  .hint a.kakaoA, .hint a.telA { display:inline-flex; align-items:center; min-height:44px; padding:0 2px; font-weight:700; white-space:nowrap; }
   .foot { max-width:560px; margin:8px auto 0; padding:8px 16px 28px; text-align:center; font-size:13px; color:var(--muted); }
   .foot a { display:inline-flex; align-items:center; min-height:40px; padding:0 6px; color:var(--body); font-weight:700; }
   .foot a.kakao { justify-content:center; min-height:48px; margin:8px 0 6px; padding:10px 22px; border-radius:999px; background:var(--kakao); color:var(--kakao-ink); font-size:15px; text-decoration:none; }
@@ -240,10 +242,10 @@
     <h2><span class="ic" aria-hidden="true">🔎</span>예약 확인·취소</h2>
     <label for="lPhone">연락처</label><input id="lPhone" type="tel" inputmode="tel" autocomplete="tel" placeholder="신청할 때 입력한 번호">
     <label for="lOrg">기관명</label><input id="lOrg" autocomplete="organization" placeholder="신청할 때 입력한 기관명">
-    <p class="hint">띄어쓰기·괄호는 달라도 괜찮아요. 기관명 전체가 기억나지 않으면 앞부분과 아래 취소 코드를 같이 넣어 주세요.</p>
+    <p class="hint">띄어쓰기·괄호는 달라도 괜찮아요. 영화·인원·매점까지 보시려면 아래 예약 확인·취소 코드도 같이 넣어 주세요. 기관명 전체가 기억나지 않을 때도 코드와 앞부분으로 찾을 수 있어요.</p>
     <!-- 버전 32(CX 검수): 처음부터 보이는 선택 칸. 기관명 앞부분만 기억나거나 조회가 막혔을 때 쓴다 -->
     <div id="lCodeWrap">
-      <label for="lCode">취소 코드 <span style="font-weight:400;color:var(--muted)">(선택 · 영어·숫자 6자리)</span></label>
+      <label for="lCode">예약 확인·취소 코드 <span style="font-weight:400;color:var(--muted)">(선택 · 영어·숫자 6자리)</span></label>
       <input id="lCode" autocomplete="off" maxlength="8" autocapitalize="characters" spellcheck="false" style="text-transform:uppercase" placeholder="예: K7PX2M (완료 화면·메일의 코드)">
     </div>
     <button type="button" class="btn" id="lookBtn">예약 조회</button>
@@ -323,7 +325,10 @@
     </ul>
     <label class="agree"><input type="checkbox" id="agree"><span>[필수] 개인정보 수집·이용에 동의해요</span></label>
     <details class="terms"><summary>무엇을 수집하나요?</summary>
-      <p>예약 확인과 연락을 위해 기관명, 담당자 이름, 연락처, 이메일(입력한 경우)을 수집하며 관람일로부터 <span id="keepTxt">1년</span>간 보관 후 파기합니다. 요청사항에 적어 주신 내용도 함께 파기해요.</p>
+      <!-- 버전 61(11/21 Codex 2차 N7·점장 결정): 실제로 지우는 범위와 남기는 범위를 그대로 적는다 -->
+      <p>예약 확인과 연락을 위해 기관명, 담당자 이름, 연락처, 이메일(입력한 경우), 요청사항을 받아요.<br>
+      담당자 이름·연락처·이메일·요청사항은 관람일로부터 <span id="keepTxt">1년</span>이 지나면 자동으로 지워요.<br>
+      기관명과 관람 기록(날짜·인원·영화)은 운영 실적으로 보관해요. 극장 내부 상담 기록은 점장이 해마다 정리해요.</p>
     </details>
 
     <div class="summary" id="summary" aria-live="polite">
@@ -828,7 +833,7 @@
       '점장이 전화나 문자로 연락드려 영화를 안내하고 확정해 드려요. 예약금 없이 관람 당일 현장에서 결제해 주세요. 날짜·시간·인원을 바꾸실 땐 예약을 취소하지 말고 카카오톡이나 전화로 알려 주세요.');
 
     const box = el('div', 'codebox');
-    box.appendChild(el('div', 't', '온라인 취소 코드'));
+    box.appendChild(el('div', 't', '예약 확인·취소 코드'));
     const code = el('div', 'code', r.code); code.id = 'doneCode';
     const copy = el('button', 'copy', '코드 복사'); copy.type = 'button';
     copy.onclick = () => {
@@ -893,10 +898,10 @@
         (r.detail ? [b.label + ' ' + b.start, '영화: ' + b.movie + (b.wish ? ' (희망: ' + b.wish + ')' : ''), '아이 ' + b.kids + '명 · 선생님 ' + b.teachers + '명'].concat(b.snack ? ['매점: ' + b.snack] : [])
           : [b.label + ' ' + b.start]).concat(['예약번호 ' + b.id])
           .forEach(t => s.appendChild(el('div', 'line', t)));
-        if (!r.detail) s.appendChild(el('p', 'hint', '영화·인원·매점은 개인정보 보호를 위해 취소 코드를 같이 넣어 조회하면 보여요.'));
+        if (!r.detail) s.appendChild(el('p', 'hint', (r.codeWrong ? '넣으신 예약 확인 코드가 맞지 않아요. 날짜·시간만 보여 드려요. ' : '') + '영화·인원·매점은 개인정보 보호를 위해 예약 확인·취소 코드를 같이 넣어 조회하면 보여요.'));
         if (b.status === '대기') s.appendChild(el('p', 'hint', '아직 확정 전이에요. ' + (info && info.contactBy ? info.contactBy + ' 안에 ' : '') + '점장이 전화나 문자로 연락드려요.'));
         if (b.canCancel) {
-          const lab = el('label', null, '취소 코드 (영어·숫자 6자리)');
+          const lab = el('label', null, '예약 확인·취소 코드 (영어·숫자 6자리)');
           const code = document.createElement('input'); code.autocomplete = 'off'; code.maxLength = 8; code.setAttribute('autocapitalize', 'characters'); code.spellcheck = false; // 코드는 영어 대문자+숫자라 숫자 자판을 띄우지 않는다
           code.placeholder = '예: K7PX2M (완료 화면·메일의 코드)'; code.style.textTransform = 'uppercase';
           code.id = 'code_' + b.id; lab.htmlFor = code.id;
@@ -919,9 +924,15 @@
               .cancelBooking($('lPhone').value, $('lOrg').value, b.id, code.value);
           };
           [lab, code, btn, msg].forEach(x => s.appendChild(x));
-          // 코드를 잊었을 때: 신청 때 적은 메일로 다시 받기(메일이 없으면 전화 안내)
+        } else if (b.status === '대기' || b.status === '확정') {
+          const p = el('p', 'hint'); setErr(p, '관람 ' + r.cancelDays + '일 전이 지나 온라인 취소가 어려워요. ' + (r.phone || '') + '로 연락해 주세요.'); s.appendChild(p);
+        }
+        // 코드를 잊었을 때: 신청 때 적은 메일로 다시 받기(메일이 없으면 전화 안내).
+        // 버전 61(11/21 Codex 2차 N5): 코드는 세부 확인에도 쓰이므로 취소 기한이 지나도 다시 받을 수 있게 취소 칸 밖으로 뺌
+        if (b.status === '대기' || b.status === '확정') {
+          const code = { focus() { const c0 = $('code_' + b.id) || $('lCode'); if (c0) c0.focus(); } };
           const forgot = el('details', 'forgot');
-          forgot.appendChild(el('summary', null, '취소 코드를 잊으셨나요?'));
+          forgot.appendChild(el('summary', null, '예약 확인·취소 코드를 잊으셨나요?'));
           if (b.hasMail) {
             const rb = el('button', 'btn ghost', '신청 때 적은 메일로 코드 다시 받기'); rb.type = 'button';
             const rm = el('div', 'hint'); rm.setAttribute('role', 'status');
@@ -930,19 +941,17 @@
               google.script.run.withSuccessHandler(x => {
                 rb.textContent = '신청 때 적은 메일로 코드 다시 받기';
                 if (x.error) { rb.disabled = false; setErr(rm, x.error); return; }
-                rm.textContent = x.to + '로 취소 코드를 보냈어요. 메일이 안 보이면 스팸함도 확인해 주세요.'; say(rm.textContent);
+                rm.textContent = x.to + '로 예약 확인·취소 코드를 보냈어요. 메일이 안 보이면 스팸함도 확인해 주세요.'; say(rm.textContent);
                 code.focus();
               }).withFailureHandler(e => { rb.disabled = false; rb.textContent = '신청 때 적은 메일로 코드 다시 받기'; setErr(rm, friendly(e, '메일을 보내지 못했어요.')); })
                 .resendCode($('lPhone').value, $('lOrg').value, b.id);
             };
             forgot.appendChild(rb); forgot.appendChild(rm);
           } else {
-            const p = el('p', 'hint'); setErr(p, '신청 때 이메일을 적지 않으셔서 메일로 다시 보내 드릴 수 없어요. ' + (r.phone || '극장') + '로 전화 주시면 바로 취소해 드릴게요.');
+            const p = el('p', 'hint'); setErr(p, '신청 때 이메일을 적지 않으셔서 메일로 다시 보내 드릴 수 없어요. ' + (r.phone || '극장') + '로 전화 주시면 바로 확인해 드릴게요.');
             forgot.appendChild(p);
           }
           s.appendChild(forgot);
-        } else if (b.status === '대기' || b.status === '확정') {
-          const p = el('p', 'hint'); setErr(p, '관람 ' + r.cancelDays + '일 전이 지나 온라인 취소가 어려워요. ' + (r.phone || '') + '로 연락해 주세요.'); s.appendChild(p);
         }
         box.appendChild(s);
       });
