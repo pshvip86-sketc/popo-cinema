@@ -115,7 +115,7 @@
   .btn.ghost { background:var(--paper); color:var(--accent); border:1.5px solid var(--accent); box-shadow:none; }
   .btn.danger { background:var(--paper); color:var(--err); border:1.5px solid var(--err); box-shadow:none; }
   .btn.kakao { background:var(--kakao); color:var(--kakao-ink); box-shadow:none; }
-  .kakao-inline { display:inline-flex; align-items:center; min-height:36px; margin-left:4px; font-weight:700; white-space:nowrap; color:var(--kakao-ink); }
+  .kakao-inline { display:inline-flex; align-items:center; min-height:44px; margin-left:4px; font-weight:700; white-space:nowrap; color:var(--kakao-ink); }
 
   /* 오류: 문제가 있는 칸 바로 아래에 */
   .invalid { border-color:var(--err) !important; background:#FFFBFB; }
@@ -174,15 +174,15 @@
   .agree input { width:22px; height:22px; min-height:0; flex:none; margin:0; accent-color:var(--accent); }
   .terms { margin-top:6px; font-size:13px; color:var(--muted); }
   .forgot { margin-top:10px; }
-  .forgot summary { cursor:pointer; color:var(--accent); min-height:40px; display:inline-flex; align-items:center; font-size:14px; }
+  .forgot summary { cursor:pointer; color:var(--accent); min-height:44px; display:inline-flex; align-items:center; font-size:14px; }
   .forgot .btn { margin-top:6px; }
-  .terms summary { cursor:pointer; color:var(--accent); min-height:32px; display:inline-flex; align-items:center; }
+  .terms summary { cursor:pointer; color:var(--accent); min-height:44px; display:inline-flex; align-items:center; }
   .terms p { margin:4px 0 0; }
   .summary { margin-top:18px; padding:14px 16px; background:var(--accent-soft); border-radius:var(--radius-sm); }
   .summary .t { font-size:13px; color:var(--body); font-weight:700; }
   .summary .v { font-size:17px; font-weight:700; margin-top:2px; }
   .summary .s { font-size:14px; color:var(--body); margin-top:2px; }
-  .summary button { margin-top:6px; padding:6px 0; min-height:36px; border:0; background:none; color:var(--accent); font-size:14px; font-weight:700; text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
+  .summary button { margin-top:6px; padding:6px 0; min-height:44px; border:0; background:none; color:var(--accent); font-size:14px; font-weight:700; text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
 
   /* 완료 화면 */
   .done { text-align:center; padding:28px 18px; }
@@ -200,7 +200,7 @@
   .code { font-size:30px; font-weight:700; letter-spacing:6px; margin:6px 0 2px; font-variant-numeric:tabular-nums; }
   .copy { min-height:40px; padding:6px 16px; border:1.5px solid var(--accent); border-radius:999px; background:var(--paper); color:var(--accent); font-size:14px; font-weight:700; cursor:pointer; }
   .done .hint { text-align:center; }
-  .linkbtn { border:0; background:none; padding:4px 0; min-height:36px; color:var(--accent); font-size:14px; font-weight:700; text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
+  .linkbtn { border:0; background:none; padding:4px 0; min-height:44px; color:var(--accent); font-size:14px; font-weight:700; text-decoration:underline; text-underline-offset:3px; cursor:pointer; }
 
   /* 조회 */
   .item .line { font-size:15px; margin:4px 0; }
@@ -210,13 +210,13 @@
   .st[data-s="취소"], .st[data-s="거절"] { background:#EFEAE4; color:#5E5A55; }
 
   /* 문의: 첫 화면에 띄우지 않는다(11/14 점장). 막힐 때만 전화 링크, 맨 아래에 작은 줄. */
-  .tel-inline { display:inline-flex; align-items:center; min-height:36px; margin-left:4px; font-weight:700; white-space:nowrap; }
+  .tel-inline { display:inline-flex; align-items:center; min-height:44px; margin-left:4px; font-weight:700; white-space:nowrap; }
   .foot { max-width:560px; margin:8px auto 0; padding:8px 16px 28px; text-align:center; font-size:13px; color:var(--muted); }
   .foot a { display:inline-flex; align-items:center; min-height:40px; padding:0 6px; color:var(--body); font-weight:700; }
   .foot a.kakao { justify-content:center; min-height:48px; margin:8px 0 6px; padding:10px 22px; border-radius:999px; background:var(--kakao); color:var(--kakao-ink); font-size:15px; text-decoration:none; }
   .foot a.kakao:hover { filter:brightness(.97); }
   .foot .foot-tel { font-size:12px; }
-  .foot .foot-tel a { min-height:36px; font-weight:500; color:var(--muted); }
+  .foot .foot-tel a { min-height:44px; display:inline-flex; align-items:center; font-weight:500; color:var(--muted); }
 </style>
 </head>
 <body>
@@ -323,7 +323,7 @@
     </ul>
     <label class="agree"><input type="checkbox" id="agree"><span>[필수] 개인정보 수집·이용에 동의해요</span></label>
     <details class="terms"><summary>무엇을 수집하나요?</summary>
-      <p>예약 확인과 연락을 위해 기관명, 담당자 이름, 연락처, 이메일(입력한 경우)을 수집하며 관람일로부터 <span id="keepTxt">1년</span>간 보관 후 파기합니다.</p>
+      <p>예약 확인과 연락을 위해 기관명, 담당자 이름, 연락처, 이메일(입력한 경우)을 수집하며 관람일로부터 <span id="keepTxt">1년</span>간 보관 후 파기합니다. 요청사항에 적어 주신 내용도 함께 파기해요.</p>
     </details>
 
     <div class="summary" id="summary" aria-live="polite">
@@ -889,8 +889,11 @@
         const s = el('section', 'item');
         const st = el('span', 'st', b.status === '대기' ? '신청 접수(확정 전)' : b.status); st.dataset.s = b.status;
         s.appendChild(st);
-        [b.label + ' ' + b.start, '영화: ' + b.movie + (b.wish ? ' (희망: ' + b.wish + ')' : ''),'아이 ' + b.kids + '명 · 선생님 ' + b.teachers + '명'].concat(b.snack ? ['매점: ' + b.snack] : []).concat(['예약번호 ' + b.id])
+        // 버전 60: 코드 없이 조회하면 서버가 날짜·시간·상태만 준다(영화·인원·매점은 취소 코드를 같이 넣었을 때만)
+        (r.detail ? [b.label + ' ' + b.start, '영화: ' + b.movie + (b.wish ? ' (희망: ' + b.wish + ')' : ''), '아이 ' + b.kids + '명 · 선생님 ' + b.teachers + '명'].concat(b.snack ? ['매점: ' + b.snack] : [])
+          : [b.label + ' ' + b.start]).concat(['예약번호 ' + b.id])
           .forEach(t => s.appendChild(el('div', 'line', t)));
+        if (!r.detail) s.appendChild(el('p', 'hint', '영화·인원·매점은 개인정보 보호를 위해 취소 코드를 같이 넣어 조회하면 보여요.'));
         if (b.status === '대기') s.appendChild(el('p', 'hint', '아직 확정 전이에요. ' + (info && info.contactBy ? info.contactBy + ' 안에 ' : '') + '점장이 전화나 문자로 연락드려요.'));
         if (b.canCancel) {
           const lab = el('label', null, '취소 코드 (영어·숫자 6자리)');
