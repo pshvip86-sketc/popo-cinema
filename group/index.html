@@ -682,7 +682,7 @@
     const lg = document.createElement('div'); lg.className = 'cal-legend';
     const md = k => Number(k.slice(5, 7)) + '/' + Number(k.slice(8, 10));
     lg.textContent = (cnt ? '이달 신청 가능 ' + cnt + '일 · 주황 테두리 날짜만 신청할 수 있어요.' : '이달은 신청 가능한 날이 없어요(예약이 찼거나 휴무).' + (calIdx < calMonths.length - 1 ? ' ›로 다음 달을 확인해 주세요.' : ' ‹로 앞 달을 확인해 주세요.')) +
-      ' 주말·공휴일·휴무일은 빠져 있어요. 신청 받는 기간: ' + md(calWindow ? calWindow[0] : firstKey) + ' ~ ' + md(calWindow ? calWindow[1] : lastKey) + '.';
+      ' 월요일·주말·공휴일·휴무일은 빠져 있어요. 신청 받는 기간: ' + md(calWindow ? calWindow[0] : firstKey) + ' ~ ' + md(calWindow ? calWindow[1] : lastKey) + '.';
     box.appendChild(lg);
   }
 
